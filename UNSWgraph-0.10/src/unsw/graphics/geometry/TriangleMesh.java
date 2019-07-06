@@ -77,6 +77,12 @@ public class TriangleMesh {
     public TriangleMesh(String plyFile) throws IOException {
         this(plyFile, false);
     }
+    
+    public TriangleMesh(Point3D... points) {
+    	/*
+    	 * create new meshes from the points and normals
+    	 */
+    }
 
     /**
      * Construct a triangle with the given PLY file. The third argument

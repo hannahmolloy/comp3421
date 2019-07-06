@@ -97,7 +97,16 @@ public class Terrain {
     public float altitude(float x, float z) {
         float altitude = 0;
 
-        // TODO: Implement this
+        int xmin = (int) Math.floor(x);
+        int xmax = (int) Math.ceil(x);
+        int zmin = (int) Math.floor(z);
+        int zmax = (int) Math.ceil(z);
+        
+        if(xmin == xmax && zmin == zmax) {
+        	return (float) getGridAltitude(xmin, zmin);
+        }
+        
+        // else linear interpolation to calculate the altitude 
         
         return altitude;
     }
