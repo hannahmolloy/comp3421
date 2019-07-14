@@ -1,14 +1,10 @@
 package unsw.graphics.world;
 
-
-
 import java.util.ArrayList;
 import java.util.List;
 
 import unsw.graphics.Vector3;
 import unsw.graphics.geometry.Point2D;
-
-
 
 /**
  * COMMENT: Comment HeightMap 
@@ -95,23 +91,66 @@ public class Terrain {
      * @return
      */
     public float altitude(float x, float z) {
+    	// ignore if out of the bounds 
         float altitude = 0;
-
+    	
+    	if((x > this.getWidth() - 1 || x < 0) || (z < 0) || z > this.getHeight() - 1){
+    		return altitude;
+    	}
+    	// enclose the point in a square made of the floors and ceilings
         int xmin = (int) Math.floor(x);
         int xmax = (int) Math.ceil(x);
         int zmin = (int) Math.floor(z);
         int zmax = (int) Math.ceil(z);
+        float hypotenuse = xmin + zmax - z;
         
+        // on an integer/vertex, so return
         if(xmin == xmax && zmin == zmax) {
         	return (float) getGridAltitude(xmin, zmin);
         }
         
         // else linear interpolation to calculate the altitude 
-        
+        if(xmin == x || xmax == x) {
+        	altitude = lerpZ(z, zmin, zmax, x, x);
+        } else if(zmin == z || zmax == z) {
+        	altitude = lerpX(x, xmin, xmax, z, z);
+        } else if(x < hypotenuse) {
+        	altitude = blerp(x, (float)xmin, (float)xmin, (float)xmax, z, 
+        			(float)zmax, (float)zmin, (float)zmin, hypotenuse);
+        } else {
+        	altitude = blerp(x, (float)xmax, (float)xmax, (float)xmin, z, 
+        			(float)zmin, (float) zmax, (float) zmax, hypotenuse);
+        }
+		
         return altitude;
     }
+    // linear interpolation with a given X
+    private float lerpX(float x, float x1, float x2, float z1, float z2) {
+        return (float) (((x - x1) / (x2 - x1)) * getGridAltitude((int)x2, (int)z2) +
+          ((x2 - x) / (x2 - x1)) * getGridAltitude((int)x1, (int)z1));
+    }
+    
+    // linear interpolation with a given Z
+    private float lerpZ(float z, float z1, float z2, float x1, float x2) {
+        return (float) (((z - z1) / (z2 - z1)) * getGridAltitude((int)x2, (int)z2) +
+          ((z2 - z) / (z2 - z1)) * getGridAltitude((int)x1, (int)z1));
+    }
+    // bilinear interpolation
+    private float blerp(float x, float x1, float x2, float x3,
+            float z, float z1, float z2, float z3, float hypotenuse) {
+    	return ((x - x1) / (hypotenuse - x1)) * lerpZ(z, z1, z3, x1, x3) +
+    			((hypotenuse - x) / (hypotenuse - x1)) * lerpZ(z, z1, z2, x1, x2);
+    }
 
-    /**
+    public int getWidth() {
+		return this.width;
+	}
+
+    public int getHeight() {
+		return this.depth;
+	}
+    
+	/**
      * Add a tree at the specified (x,z) point. 
      * The tree's y coordinate is calculated from the altitude of the terrain at that point.
      * 
