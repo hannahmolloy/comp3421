@@ -5,8 +5,12 @@ package unsw.graphics.world;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.jogamp.opengl.GL3;
+
 import unsw.graphics.Vector3;
 import unsw.graphics.geometry.Point2D;
+import unsw.graphics.geometry.Point3D;
+import unsw.graphics.geometry.TriangleMesh;
 
 
 
@@ -23,6 +27,7 @@ public class Terrain {
     private List<Tree> trees;
     private List<Road> roads;
     private Vector3 sunlight;
+    private TriangleMesh mesh;
 
     /**
      * Create a new terrain
@@ -37,9 +42,10 @@ public class Terrain {
         trees = new ArrayList<Tree>();
         roads = new ArrayList<Road>();
         this.sunlight = sunlight;
+        mesh = createMesh();
     }
 
-    public List<Tree> trees() {
+	public List<Tree> trees() {
         return trees;
     }
 
@@ -99,7 +105,14 @@ public class Terrain {
 
         // TODO: Implement this
         
-        return altitude;
+        // test if x and z are integers
+        // if so, just call getGridAltitude and return the y value
+        
+        
+        // otherwise we have to use bilinear interpolation to find the altitude
+        
+        
+        return (float) getGridAltitude((int)x,(int)z);
     }
 
     /**
@@ -127,4 +140,40 @@ public class Terrain {
         roads.add(road);        
     }
 
+    
+    /*
+     * create a function that creates the triangle mesh
+     */
+    private TriangleMesh createMesh() {
+    	List<Point3D> points = new ArrayList<Point3D>();
+    	
+    	for (float row = 0; row < depth - 2; row++) {
+    		for (float col = 0; col < width - 2; col++) {
+    			/* for each square of points 
+    			 * two triangles need to be made
+    			 * 	(row,col)  	(row,col+1)
+						   +-----+
+						   |    /|
+						   |  /  |
+						   |/    |
+						   +-----+
+					(row+1,col)	 (row+1,col+1)
+    			 */
+    			points.add(new Point3D(row, col, altitude(row, col)));
+    			points.add(new Point3D(row+1, col, altitude(row+1, col)));
+    			points.add(new Point3D(row, col+1, altitude(row, col+1)));
+    			
+    			points.add(new Point3D(row+1, col, altitude(row+1, col)));
+    			points.add(new Point3D(row+1, col+1, altitude(row+1, col+1)));
+    			points.add(new Point3D(row, col+1, altitude(row, col+1)));
+    		}
+    	}
+    	
+		return new TriangleMesh(points, true);
+	}
+    
+    public void draw(GL3 gl) {
+    	
+    	mesh.draw(gl);
+    }
 }
