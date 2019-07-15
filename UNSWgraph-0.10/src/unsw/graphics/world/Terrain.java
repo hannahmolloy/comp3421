@@ -27,7 +27,6 @@ public class Terrain {
     private List<Tree> trees;
     private List<Road> roads;
     private Vector3 sunlight;
-    private TriangleMesh mesh;
 
     /**
      * Create a new terrain
@@ -42,7 +41,6 @@ public class Terrain {
         trees = new ArrayList<Tree>();
         roads = new ArrayList<Road>();
         this.sunlight = sunlight;
-        mesh = createMesh();
     }
 
 	public List<Tree> trees() {
@@ -184,35 +182,49 @@ public class Terrain {
     /*
      * create a function that creates the triangle mesh
      */
-    private TriangleMesh createMesh() {
+    public TriangleMesh createMesh() {
     	List<Point3D> points = new ArrayList<Point3D>();
+    	List<Integer> vertices = new ArrayList<Integer>();
+    	float row;
+    	float col;
     	
-    	for (float row = 0; row < depth - 2; row++) {
-    		for (float col = 0; col < width - 2; col++) {
+    	for (row = 0; row < depth; row++) {
+    		for (col = 0; col < width; col++) {
     			/* for each square of points 
     			 * two triangles need to be made
-    			 * 	(row,col)  	(row,col+1)
+    			 * 	topLeft  	topRight
 						   +-----+
 						   |    /|
 						   |  /  |
 						   |/    |
 						   +-----+
-					(row+1,col)	 (row+1,col+1)
+					bottomLeft	 bottomRight
     			 */
-    			points.add(new Point3D(row, col, altitude(row, col)));
-    			points.add(new Point3D(row+1, col, altitude(row+1, col)));
-    			points.add(new Point3D(row, col+1, altitude(row, col+1)));
     			
-    			points.add(new Point3D(row+1, col, altitude(row+1, col)));
-    			points.add(new Point3D(row+1, col+1, altitude(row+1, col+1)));
-    			points.add(new Point3D(row, col+1, altitude(row, col+1)));
+    			points.add(new Point3D(row, col, altitude(row, col)));
+    			
+    			if (row < depth - 1 && col < width - 1) {
+    				int topLeft = (int) (row * width + col);
+        			int topRight = (int) (row * width + col + 1);
+        			int bottomLeft = (int) ((row + 1) * width + col);
+        			int bottomRight = (int) ((row + 1) * width + col + 1);
+        			
+        			vertices.add(new Integer(topLeft));
+        			vertices.add(new Integer(bottomLeft));
+        			vertices.add(new Integer(topRight));
+        			
+        			vertices.add(new Integer(bottomLeft));
+        			vertices.add(new Integer(bottomRight));
+        			vertices.add(new Integer(topRight));
+    			}
     		}
     	}
     	
-		return new TriangleMesh(points, true);
+		return new TriangleMesh(points, vertices, true);
 	}
     
     public void draw(GL3 gl) {
+    	TriangleMesh mesh = createMesh();
     	
     	mesh.draw(gl);
     }

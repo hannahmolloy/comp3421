@@ -41,6 +41,8 @@ public class World extends Application3D {
 	@Override
 	public void display(GL3 gl) {
 		super.display(gl);
+		
+		terrain.draw(gl);
 	}
 
 	@Override
@@ -52,8 +54,6 @@ public class World extends Application3D {
 	@Override
 	public void init(GL3 gl) {
 		super.init(gl);
-		
-		terrain.draw(gl);
 	}
 
 	@Override
