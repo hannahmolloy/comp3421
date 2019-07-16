@@ -1,7 +1,5 @@
 package unsw.graphics.world;
 
-
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,10 +40,10 @@ public class Terrain {
         trees = new ArrayList<Tree>();
         roads = new ArrayList<Road>();
         this.sunlight = sunlight;
-		mesh = createMesh();
     }
     
     public void init(GL3 gl) {
+    	mesh = createMesh();
     	mesh.init(gl);
     }
 
@@ -206,8 +204,9 @@ public class Terrain {
 						   +-----+
 					bottomLeft	 bottomRight
     			 */
+    			double alt = altitude(row, col);
     			
-    			points.add(new Point3D(row, col, altitude(row, col)));
+    			points.add(new Point3D(row, (float)alt, col));
     			
     			if (row < depth - 1 && col < width - 1) {
     				int topLeft = (int) (row * width + col);

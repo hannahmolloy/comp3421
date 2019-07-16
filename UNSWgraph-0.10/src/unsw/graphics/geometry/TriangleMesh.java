@@ -294,12 +294,13 @@ public class TriangleMesh {
             gl.glBindBuffer(GL.GL_ARRAY_BUFFER, normalsName);
             gl.glVertexAttribPointer(Shader.NORMAL, 3, GL.GL_FLOAT, false, 0, 0);
         }
+
         Shader.setModelMatrix(gl, frame.getMatrix());
         if (indices != null) {
-            gl.glDrawElements(GL3.GL_TRIANGLES, indices.capacity(),
+            gl.glDrawElements(GL3.GL_LINE_STRIP, indices.capacity(),
                     GL.GL_UNSIGNED_INT, 0);
         } else {
-            gl.glDrawArrays(GL3.GL_TRIANGLES, 0, vertices.capacity());
+            gl.glDrawArrays(GL3.GL_LINE_STRIP, 0, vertices.capacity());
         }
     }
 
