@@ -204,9 +204,8 @@ public class Terrain {
 						   +-----+
 					bottomLeft	 bottomRight
     			 */
-    			double alt = altitude(row, col);
-    			
-    			points.add(new Point3D(row, (float)alt, col));
+
+    			points.add(new Point3D(row, (float)altitude(row, col), col));
     			
     			if (row < depth - 1 && col < width - 1) {
     				int topLeft = (int) (row * width + col);
