@@ -5,6 +5,8 @@ import java.util.List;
 
 import com.jogamp.opengl.GL3;
 
+import unsw.graphics.CoordFrame3D;
+import unsw.graphics.Matrix4;
 import unsw.graphics.Vector3;
 import unsw.graphics.geometry.Point2D;
 import unsw.graphics.geometry.Point3D;
@@ -228,6 +230,13 @@ public class Terrain {
 	}
     
     public void draw(GL3 gl) {
+    	for (Tree t : trees) {
+    		CoordFrame3D frame = CoordFrame3D.identity()
+    					.translate(t.getPosition())
+    					.translate(0, 0.5f, 0)
+    					.scale(0.1f, 0.1f, 0.1f);
+    		t.draw(gl, frame);
+    	}
     	mesh.draw(gl);
     }
 }
