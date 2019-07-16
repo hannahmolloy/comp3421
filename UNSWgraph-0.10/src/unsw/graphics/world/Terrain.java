@@ -27,6 +27,7 @@ public class Terrain {
     private List<Tree> trees;
     private List<Road> roads;
     private Vector3 sunlight;
+    private TriangleMesh mesh;
 
     /**
      * Create a new terrain
@@ -41,6 +42,11 @@ public class Terrain {
         trees = new ArrayList<Tree>();
         roads = new ArrayList<Road>();
         this.sunlight = sunlight;
+		mesh = createMesh();
+    }
+    
+    public void init(GL3 gl) {
+    	mesh.init(gl);
     }
 
 	public List<Tree> trees() {
@@ -182,9 +188,9 @@ public class Terrain {
     /*
      * create a function that creates the triangle mesh
      */
-    public TriangleMesh createMesh() {
+    private TriangleMesh createMesh() {
     	List<Point3D> points = new ArrayList<Point3D>();
-    	List<Integer> vertices = new ArrayList<Integer>();
+    	List<Integer> indices = new ArrayList<Integer>();
     	float row;
     	float col;
     	
@@ -209,23 +215,21 @@ public class Terrain {
         			int bottomLeft = (int) ((row + 1) * width + col);
         			int bottomRight = (int) ((row + 1) * width + col + 1);
         			
-        			vertices.add(new Integer(topLeft));
-        			vertices.add(new Integer(bottomLeft));
-        			vertices.add(new Integer(topRight));
+        			indices.add(new Integer(topLeft));
+        			indices.add(new Integer(bottomLeft));
+        			indices.add(new Integer(topRight));
         			
-        			vertices.add(new Integer(bottomLeft));
-        			vertices.add(new Integer(bottomRight));
-        			vertices.add(new Integer(topRight));
+        			indices.add(new Integer(bottomLeft));
+        			indices.add(new Integer(bottomRight));
+        			indices.add(new Integer(topRight));
     			}
     		}
     	}
-    	
-		return new TriangleMesh(points, vertices, true);
+
+		return new TriangleMesh(points, indices, true);
 	}
     
     public void draw(GL3 gl) {
-    	TriangleMesh mesh = createMesh();
-    	
     	mesh.draw(gl);
     }
 }

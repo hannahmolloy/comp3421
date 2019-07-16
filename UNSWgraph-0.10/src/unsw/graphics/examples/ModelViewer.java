@@ -66,23 +66,24 @@ public class ModelViewer extends Application3D {
 //            texture = new Texture(gl, "res/textures/BrightPurpleMarble.png", "png", false);
 //        }
 
-        Shader shader = null;
-        if (USE_CUBEMAP) {
-            shader = new Shader(gl, "shaders/vertex_phong.glsl",
-                    "shaders/fragment_cubemap.glsl");
-        } else if (USE_LIGHTING && USE_TEXTURE) {
-            shader = new Shader(gl, "shaders/vertex_tex_phong.glsl",
-                    "shaders/fragment_tex_phong.glsl");
-        } else if (USE_LIGHTING) {
-            shader = new Shader(gl, "shaders/vertex_phong.glsl",
-                    "shaders/fragment_phong.glsl");
-        } else if (USE_TEXTURE) {
-            shader = new Shader(gl, "shaders/vertex_tex_3d.glsl",
-                    "shaders/fragment_tex_3d.glsl");
-        } else {
-            shader = new Shader(gl, "shaders/vertex_3d.glsl", "shaders/fragment_3d.glsl");
-        }
-        shader.use(gl);
+//        Shader shader = null;
+//        if (USE_CUBEMAP) {
+//            shader = new Shader(gl, "shaders/vertex_phong.glsl",
+//                    "shaders/fragment_cubemap.glsl");
+//        } else if (USE_LIGHTING && USE_TEXTURE) {
+//            shader = new Shader(gl, "shaders/vertex_tex_phong.glsl",
+//                    "shaders/fragment_tex_phong.glsl");
+//        } else if (USE_LIGHTING) {
+//            shader = new Shader(gl, "shaders/vertex_phong.glsl",
+//                    "shaders/fragment_phong.glsl");
+//        } else if (USE_TEXTURE) {
+//            shader = new Shader(gl, "shaders/vertex_tex_3d.glsl",
+//                    "shaders/fragment_tex_3d.glsl");
+//        } else {
+//            shader = new Shader(gl, "shaders/vertex_3d.glsl", "shaders/fragment_3d.glsl");
+//        }
+//
+//        shader.use(gl);
     }
 
     @Override
