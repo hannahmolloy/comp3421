@@ -58,7 +58,7 @@ public class Vector4 {
     }
     
     /**
-     * Ignores the final value to create a 2D point
+     * Ignores the final value to create a 3D point
      * @return
      */
     public Point3D asPoint3D() {

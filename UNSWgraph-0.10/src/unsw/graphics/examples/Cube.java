@@ -83,4 +83,8 @@ public class Cube extends Application3D {
         Shader.setPenColor(gl, Color.MAGENTA);
         face.draw(gl, frame.rotateX(90));
     }
+    
+    public void drawCube(GL3 gl) {
+    	drawCube(gl, CoordFrame3D.identity());
+    }
 }
