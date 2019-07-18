@@ -206,6 +206,20 @@ public class Shader {
     
     /**
      * Set an arbitrary uniform variable of type 'vec3' with the given
+     * Point3D
+     * @param gl
+     * @param var
+     * @param point3d
+     */
+    public static void setVector3D(GL3 gl, String var, Vector3 point3d) {
+        int ids[] = new int[1];
+        gl.glGetIntegerv(GL3.GL_CURRENT_PROGRAM, ids, 0);
+        int loc = gl.glGetUniformLocation(ids[0], var);
+        gl.glUniform3f(loc, point3d.getX(), point3d.getY(), point3d.getZ());
+    }
+    
+    /**
+     * Set an arbitrary uniform variable of type 'vec3' with the given
      * Color.
      * @param gl
      * @param var

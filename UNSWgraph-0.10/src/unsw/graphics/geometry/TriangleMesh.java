@@ -3,6 +3,7 @@
  */
 package unsw.graphics.geometry;
 
+import java.awt.Color;
 import java.io.IOException;
 import java.nio.IntBuffer;
 import java.util.List;
@@ -298,10 +299,10 @@ public class TriangleMesh {
 
         Shader.setModelMatrix(gl, frame.getMatrix());
         if (indices != null) {
-            gl.glDrawElements(GL3.GL_LINE_STRIP, indices.capacity(),
+            gl.glDrawElements(GL3.GL_TRIANGLES, indices.capacity(),
                     GL.GL_UNSIGNED_INT, 0);
         } else {
-            gl.glDrawArrays(GL3.GL_LINE_STRIP, 0, vertices.capacity());
+            gl.glDrawArrays(GL3.GL_TRIANGLES, 0, vertices.capacity());
         }
     }
 

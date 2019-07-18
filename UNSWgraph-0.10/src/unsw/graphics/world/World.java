@@ -1,5 +1,6 @@
 package unsw.graphics.world;
 
+import java.awt.Color;
 import java.io.File;
 import java.io.FileNotFoundException;
 
@@ -24,7 +25,6 @@ public class World extends Application3D {
     private Point3D cameraPos;
     private float zoom;
     private float aspectRatio;
-    private Shader shader;
     private int rotateX, rotateY, rotateZ;
 
     public World(Terrain terrain) {
@@ -53,7 +53,7 @@ public class World extends Application3D {
     @Override
 	public void init(GL3 gl) {
 		super.init(gl);
-		shader = new Shader(gl, "shaders/vertex_3d.glsl", "shaders/fragment_3d.glsl");
+		Shader shader = new Shader(gl, "shaders/vertex_phong.glsl", "shaders/fragment_phong.glsl");
 		getWindow().addKeyListener(new KeyAdapter() {
           @Override
           public void keyPressed(KeyEvent ev) {
@@ -104,6 +104,16 @@ public class World extends Application3D {
     	Shader.setViewMatrix(gl, viewMatrix);
     	Shader.setProjMatrix(gl, projMatrix);
     	
+		Shader.setVector3D(gl, "lightPos", terrain.getSunlight());
+		Shader.setColor(gl, "lightIntensity", Color.WHITE);
+		Shader.setColor(gl, "ambientIntensity", new Color(0.2f, 0.2f, 0.2f));
+		
+		 // Set the material properties
+		Shader.setColor(gl, "ambientCoeff", Color.WHITE);
+		Shader.setColor(gl, "diffuseCoeff", new Color(0.5f, 0.5f, 0.5f));
+		Shader.setColor(gl, "specularCoeff", new Color(0.8f, 0.8f, 0.8f));
+		Shader.setFloat(gl, "phongExp", 16f);
+		Shader.setPenColor(gl, Color.GREEN);
     	terrain.draw(gl);
 	}
 

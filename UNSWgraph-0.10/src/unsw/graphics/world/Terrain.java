@@ -216,12 +216,12 @@ public class Terrain {
         			int bottomRight = (int) ((row + 1) * width + col + 1);
         			
         			indices.add(new Integer(topLeft));
-        			indices.add(new Integer(bottomLeft));
         			indices.add(new Integer(topRight));
+        			indices.add(new Integer(bottomLeft));
         			
         			indices.add(new Integer(bottomLeft));
-        			indices.add(new Integer(bottomRight));
         			indices.add(new Integer(topRight));
+        			indices.add(new Integer(bottomRight));
     			}
     		}
     	}
