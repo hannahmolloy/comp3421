@@ -3,8 +3,14 @@ package unsw.graphics.world;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.jogamp.opengl.GL3;
+
+import unsw.graphics.CoordFrame3D;
+import unsw.graphics.Matrix4;
 import unsw.graphics.Vector3;
 import unsw.graphics.geometry.Point2D;
+import unsw.graphics.geometry.Point3D;
+import unsw.graphics.geometry.TriangleMesh;
 
 /**
  * COMMENT: Comment HeightMap 
@@ -19,6 +25,7 @@ public class Terrain {
     private List<Tree> trees;
     private List<Road> roads;
     private Vector3 sunlight;
+    private TriangleMesh mesh;
 
     /**
      * Create a new terrain
@@ -34,8 +41,13 @@ public class Terrain {
         roads = new ArrayList<Road>();
         this.sunlight = sunlight;
     }
+    
+    public void init(GL3 gl) {
+    	mesh = createMesh();
+    	mesh.init(gl);
+    }
 
-    public List<Tree> trees() {
+	public List<Tree> trees() {
         return trees;
     }
 
@@ -93,8 +105,8 @@ public class Terrain {
     public float altitude(float x, float z) {
     	// ignore if out of the bounds 
         float altitude = 0;
-    	
-    	if((x > this.getWidth() - 1 || x < 0) || (z < 0) || z > this.getHeight() - 1){
+
+    	if((x > this.width - 1 || x < 0) || (z < 0) || z > this.depth - 1){
     		return altitude;
     	}
     	// enclose the point in a square made of the floors and ceilings
@@ -124,6 +136,7 @@ public class Terrain {
 		
         return altitude;
     }
+
     // linear interpolation with a given X
     private float lerpX(float x, float x1, float x2, float z1, float z2) {
         return (float) (((x - x1) / (x2 - x1)) * getGridAltitude((int)x2, (int)z2) +
@@ -135,12 +148,14 @@ public class Terrain {
         return (float) (((z - z1) / (z2 - z1)) * getGridAltitude((int)x2, (int)z2) +
           ((z2 - z) / (z2 - z1)) * getGridAltitude((int)x1, (int)z1));
     }
+
     // bilinear interpolation
     private float blerp(float x, float x1, float x2, float x3,
             float z, float z1, float z2, float z3, float hypotenuse) {
     	return ((x - x1) / (hypotenuse - x1)) * lerpZ(z, z1, z3, x1, x3) +
     			((hypotenuse - x) / (hypotenuse - x1)) * lerpZ(z, z1, z2, x1, x2);
     }
+
 
     public int getWidth() {
 		return this.width;
@@ -175,4 +190,59 @@ public class Terrain {
         roads.add(road);        
     }
 
+    
+    /*
+     * create a function that creates the triangle mesh
+     */
+    private TriangleMesh createMesh() {
+    	List<Point3D> points = new ArrayList<Point3D>();
+    	List<Integer> indices = new ArrayList<Integer>();
+    	float row;
+    	float col;
+    	
+    	for (row = 0; row < depth; row++) {
+    		for (col = 0; col < width; col++) {
+    			/* for each square of points 
+    			 * two triangles need to be made
+    			 * 	topLeft  	topRight
+						   +-----+
+						   |    /|
+						   |  /  |
+						   |/    |
+						   +-----+
+					bottomLeft	 bottomRight
+    			 */
+
+    			points.add(new Point3D(row, (float)altitude(row, col), col));
+    			
+    			if (row < depth - 1 && col < width - 1) {
+    				int topLeft = (int) (row * width + col);
+        			int topRight = (int) (row * width + col + 1);
+        			int bottomLeft = (int) ((row + 1) * width + col);
+        			int bottomRight = (int) ((row + 1) * width + col + 1);
+        			
+        			indices.add(new Integer(topLeft));
+        			indices.add(new Integer(topRight));
+        			indices.add(new Integer(bottomLeft));
+        			
+        			indices.add(new Integer(bottomLeft));
+        			indices.add(new Integer(topRight));
+        			indices.add(new Integer(bottomRight));
+    			}
+    		}
+    	}
+
+		return new TriangleMesh(points, indices, true);
+	}
+    
+    public void draw(GL3 gl) {
+    	for (Tree t : trees) {
+    		CoordFrame3D frame = CoordFrame3D.identity()
+    					.translate(t.getPosition())
+    					.translate(0, 0.5f, 0)
+    					.scale(0.1f, 0.1f, 0.1f);
+    		t.draw(gl, frame);
+    	}
+    	mesh.draw(gl);
+    }
 }
