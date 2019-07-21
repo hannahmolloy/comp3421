@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.io.File;
 import java.io.FileNotFoundException;
 
+import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL3;
 
 import unsw.graphics.Application3D;
@@ -53,7 +54,10 @@ public class World extends Application3D {
     @Override
 	public void init(GL3 gl) {
 		super.init(gl);
-		Shader shader = new Shader(gl, "shaders/vertex_phong.glsl", "shaders/fragment_phong.glsl");
+		terrain.init(gl);
+		//Shader shader = new Shader(gl, "shaders/vertex_phong.glsl", "shaders/fragment_phong.glsl");
+		Shader shader = new Shader(gl, "shaders/vertex_tex_phong.glsl", "shaders/fragment_tex_phong.glsl");
+		shader.use(gl);
 		getWindow().addKeyListener(new KeyAdapter() {
           @Override
           public void keyPressed(KeyEvent ev) {
@@ -66,7 +70,7 @@ public class World extends Application3D {
               else if (ev.getKeyCode() == KeyEvent.VK_DOWN)
                   cameraPos = cameraPos.translate(0, -0.02f/zoom, 0);
               else if (ev.getKeyCode() == KeyEvent.VK_SPACE)
-                  zoom *= 1.01;
+                  zoom *= 1.05;
               else if (ev.getKeyCode() == KeyEvent.VK_Z)
             	  zoom /= 1.01;
               else if (ev.getKeyCode() == KeyEvent.VK_A)
@@ -84,14 +88,13 @@ public class World extends Application3D {
           }
 		});
 		
-		shader.use(gl);
 	}
 
 	@Override
 	public void display(GL3 gl) {
 		super.display(gl);
 
-		terrain.init(gl);
+		//terrain.init(gl);
 		Matrix4 viewMatrix = Matrix4.scale(1/aspectRatio, 1, 1)
 				.multiply(Matrix4.scale(1/zoom, 1/zoom, 1))
 				.multiply(Matrix4.rotationX(-rotateX))
@@ -113,7 +116,9 @@ public class World extends Application3D {
 		Shader.setColor(gl, "diffuseCoeff", new Color(0.5f, 0.5f, 0.5f));
 		Shader.setColor(gl, "specularCoeff", new Color(0.8f, 0.8f, 0.8f));
 		Shader.setFloat(gl, "phongExp", 16f);
+		
 		Shader.setPenColor(gl, Color.GREEN);
+		
     	terrain.draw(gl);
 	}
 

@@ -3,10 +3,13 @@ package unsw.graphics.world;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL3;
 
 import unsw.graphics.CoordFrame3D;
 import unsw.graphics.Matrix4;
+import unsw.graphics.Shader;
+import unsw.graphics.Texture;
 import unsw.graphics.Vector3;
 import unsw.graphics.geometry.Point2D;
 import unsw.graphics.geometry.Point3D;
@@ -25,6 +28,7 @@ public class Terrain {
     private List<Tree> trees;
     private List<Road> roads;
     private Vector3 sunlight;
+    private Texture terrainTex;
     private TriangleMesh mesh;
 
     /**
@@ -43,7 +47,11 @@ public class Terrain {
     }
     
     public void init(GL3 gl) {
-    	mesh = createMesh();
+    	Shader shader = new Shader(gl, "shaders/vertex_tex_3d.glsl",
+             "shaders/fragment_tex_3d.glsl");
+    	shader.use(gl);
+	 
+    	mesh = createMesh(gl);
     	mesh.init(gl);
     }
 
@@ -194,14 +202,19 @@ public class Terrain {
     /*
      * create a function that creates the triangle mesh
      */
-    private TriangleMesh createMesh() {
+    private TriangleMesh createMesh(GL3 gl) {
+    	
     	List<Point3D> points = new ArrayList<Point3D>();
     	List<Integer> indices = new ArrayList<Integer>();
+    	List<Point2D> texCoords = new ArrayList<Point2D>();
     	float row;
     	float col;
     	
     	for (row = 0; row < depth; row++) {
     		for (col = 0; col < width; col++) {
+    			
+    			texCoords.add(new Point2D(row, col));
+    			
     			/* for each square of points 
     			 * two triangles need to be made
     			 * 	topLeft  	topRight
@@ -232,10 +245,16 @@ public class Terrain {
     		}
     	}
 
-		return new TriangleMesh(points, indices, true);
+		return new TriangleMesh(points, indices, texCoords, true);
 	}
     
     public void draw(GL3 gl) {
+    	terrainTex = new Texture(gl, "res/textures/grass.bmp","bmp", true);
+    	
+        Shader.setInt(gl, "tex", 0);
+    	gl.glActiveTexture(GL.GL_TEXTURE0);
+    	gl.glBindTexture(GL.GL_TEXTURE_2D, terrainTex.getId());
+    	
     	for (Tree t : trees) {
     		CoordFrame3D frame = CoordFrame3D.identity()
     					.translate(t.getPosition())
