@@ -258,8 +258,8 @@ public class Terrain {
     	for (Tree t : trees) {
     		CoordFrame3D frame = CoordFrame3D.identity()
     					.translate(t.getPosition())
-    					.translate(0, 0.5f, 0)
-    					.scale(0.1f, 0.1f, 0.1f);
+    					.translate(0, 1f, 0)
+    					.scale(0.2f, 0.2f, 0.2f);
     		t.draw(gl, frame);
     	}
     	mesh.draw(gl);

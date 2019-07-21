@@ -31,7 +31,7 @@ public class Scene {
     public Scene() {
         root = new SceneObject();
         myTime = System.currentTimeMillis();
-        myCamera = new Camera(root);
+        //myCamera = new Camera(root);
     }
 
     public void reshape(int width, int height) {
