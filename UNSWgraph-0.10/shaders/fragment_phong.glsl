@@ -45,6 +45,6 @@ void main()
 
     vec3 intensity = ambient + diffuse + specular;
 
-    //outputColor = vec4(specular,1) + intensity*input_color*texture(tex, texCoordFrag);
-    outputColor = vec4(intensity,1) * input_color;
+    outputColor = vec4(specular,1) + intensity*input_color*texture(tex, texCoordFrag);
+    //outputColor = vec4(intensity,1) * input_color;
 }
