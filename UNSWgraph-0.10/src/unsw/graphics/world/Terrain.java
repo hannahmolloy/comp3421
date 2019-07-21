@@ -7,6 +7,8 @@ import com.jogamp.opengl.GL3;
 
 import unsw.graphics.CoordFrame3D;
 import unsw.graphics.Matrix4;
+import unsw.graphics.Shader;
+import unsw.graphics.Texture;
 import unsw.graphics.Vector3;
 import unsw.graphics.geometry.Point2D;
 import unsw.graphics.geometry.Point3D;
@@ -26,7 +28,9 @@ public class Terrain {
     private List<Road> roads;
     private Vector3 sunlight;
     private TriangleMesh mesh;
-
+    private Texture texture;
+    private Shader shader;
+    
     /**
      * Create a new terrain
      *
@@ -43,8 +47,14 @@ public class Terrain {
     }
     
     public void init(GL3 gl) {
+    	texture = new Texture(gl, "res/textures/grass.bmp", "bmp", false);
+        
     	mesh = createMesh();
     	mesh.init(gl);
+    	
+    	shader = new Shader(gl, "shaders/vertex_tex_3d.glsl",
+                "shaders/fragment_tex_3d.glsl");
+        shader.use(gl);
     }
 
 	public List<Tree> trees() {

@@ -3,11 +3,15 @@ package unsw.graphics.world;
 import java.io.File;
 import java.io.FileNotFoundException;
 
+import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL3;
 
 import unsw.graphics.Application3D;
 import unsw.graphics.Matrix4;
+import unsw.graphics.Point2DBuffer;
+import unsw.graphics.Point3DBuffer;
 import unsw.graphics.Shader;
+import unsw.graphics.Texture;
 import unsw.graphics.geometry.Point3D;
 
 import com.jogamp.newt.event.KeyAdapter;
@@ -25,6 +29,7 @@ public class World extends Application3D {
     private float zoom;
     private float aspectRatio;
     private Shader shader;
+    private Texture texture;
     private int rotateX, rotateY, rotateZ;
 
     public World(Terrain terrain) {
@@ -54,6 +59,8 @@ public class World extends Application3D {
 	public void init(GL3 gl) {
 		super.init(gl);
 		shader = new Shader(gl, "shaders/vertex_3d.glsl", "shaders/fragment_3d.glsl");
+		texture = new Texture(gl, "res/textures/grass.bmp", "bmp", false);
+		
 		getWindow().addKeyListener(new KeyAdapter() {
           @Override
           public void keyPressed(KeyEvent ev) {
@@ -90,7 +97,11 @@ public class World extends Application3D {
 	@Override
 	public void display(GL3 gl) {
 		super.display(gl);
-
+		
+		Shader.setInt(gl, "tex", 0);
+        gl.glActiveTexture(GL.GL_TEXTURE0);
+        gl.glBindTexture(GL.GL_TEXTURE_2D, texture.getId());
+        
 		terrain.init(gl);
 		Matrix4 viewMatrix = Matrix4.scale(1/aspectRatio, 1, 1)
 				.multiply(Matrix4.scale(1/zoom, 1/zoom, 1))

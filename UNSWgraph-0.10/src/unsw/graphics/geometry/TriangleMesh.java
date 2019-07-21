@@ -3,6 +3,7 @@
  */
 package unsw.graphics.geometry;
 
+import java.awt.Color;
 import java.io.IOException;
 import java.nio.IntBuffer;
 import java.util.List;
@@ -22,6 +23,8 @@ import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.util.GLBuffers;
 
 import unsw.graphics.CoordFrame3D;
+import unsw.graphics.Matrix4;
+import unsw.graphics.Point2DBuffer;
 import unsw.graphics.Point3DBuffer;
 import unsw.graphics.Shader;
 import unsw.graphics.Vector3;
@@ -54,6 +57,8 @@ public class TriangleMesh {
      * indices forms a triangle.
      */
     private IntBuffer indices;
+    
+    private Point2DBuffer textureBuffer;
 
     /**
      * The name of the vertex buffer according to OpenGL
@@ -301,13 +306,14 @@ public class TriangleMesh {
             gl.glBindBuffer(GL.GL_ARRAY_BUFFER, normalsName);
             gl.glVertexAttribPointer(Shader.NORMAL, 3, GL.GL_FLOAT, false, 0, 0);
         }
-
         Shader.setModelMatrix(gl, frame.getMatrix());
+        Shader.setPenColor(gl, Color.BLUE);
+        
         if (indices != null) {
-            gl.glDrawElements(GL3.GL_LINE_STRIP, indices.capacity(),
+            gl.glDrawElements(GL3.GL_TRIANGLES, indices.capacity(),
                     GL.GL_UNSIGNED_INT, 0);
         } else {
-            gl.glDrawArrays(GL3.GL_LINE_STRIP, 0, vertices.capacity());
+            gl.glDrawArrays(GL3.GL_TRIANGLES, 0, vertices.capacity());
         }
     }
 
