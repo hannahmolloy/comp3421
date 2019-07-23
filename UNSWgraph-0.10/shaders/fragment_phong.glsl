@@ -16,8 +16,14 @@ uniform vec3 diffuseCoeff;
 uniform vec3 specularCoeff;
 uniform float phongExp;
 
+// texture
+uniform sampler2D tex;
+
+in vec2 texCoordFrag;
+
 in vec4 viewPosition;
 in vec3 m;
+
 
 void main()
 {
@@ -39,5 +45,6 @@ void main()
 
     vec3 intensity = ambient + diffuse + specular;
 
-    outputColor = vec4(intensity,1)*input_color;
+    outputColor = vec4(specular,1) + intensity*input_color*texture(tex, texCoordFrag);
+    //outputColor = vec4(intensity,1) * input_color;
 }

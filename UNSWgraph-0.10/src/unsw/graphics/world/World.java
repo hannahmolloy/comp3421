@@ -4,11 +4,13 @@ import java.awt.Color;
 import java.io.File;
 import java.io.FileNotFoundException;
 
+import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL3;
 
 import unsw.graphics.Application3D;
 import unsw.graphics.Matrix4;
 import unsw.graphics.Shader;
+import unsw.graphics.scene.Camera;
 import unsw.graphics.geometry.Point3D;
 
 import com.jogamp.newt.event.KeyAdapter;
@@ -23,6 +25,7 @@ public class World extends Application3D {
 
     private Terrain terrain;
     private Point3D cameraPos;
+    private Camera camera;
     private float zoom;
     private float aspectRatio;
     private int rotateX, rotateY, rotateZ;
@@ -36,6 +39,7 @@ public class World extends Application3D {
     	rotateX = 0;
     	rotateY = 0;
     	rotateZ = 0;
+    	camera = new Camera(terrain, cameraPos);
     }
    
     /**
@@ -51,47 +55,55 @@ public class World extends Application3D {
     }
     
     @Override
+    /**
+     * Have not properly implemented the camera and movement but this is the current standby, 
+     * implemented this at the start and then forgot it still needed to be done properly, 
+     * will complete for Milestone 2 
+     */
 	public void init(GL3 gl) {
 		super.init(gl);
-		Shader shader = new Shader(gl, "shaders/vertex_phong.glsl", "shaders/fragment_phong.glsl");
+		terrain.init(gl);
+		//Shader shader = new Shader(gl, "shaders/vertex_phong.glsl", "shaders/fragment_phong.glsl");
+		Shader shader = new Shader(gl, "shaders/vertex_tex_phong.glsl", "shaders/fragment_tex_phong.glsl");
+		shader.use(gl);
 		getWindow().addKeyListener(new KeyAdapter() {
           @Override
           public void keyPressed(KeyEvent ev) {
+        	  
               if (ev.getKeyCode() == KeyEvent.VK_LEFT)
-                  cameraPos = cameraPos.translate(-0.02f/zoom, 0, 0);
+                  cameraPos = cameraPos.translate(-0.1f/zoom, 0, 0);
               else if (ev.getKeyCode() == KeyEvent.VK_RIGHT)
-                  cameraPos = cameraPos.translate(0.02f/zoom, 0, 0);
+                  cameraPos = cameraPos.translate(0.1f/zoom, 0, 0);
               else if (ev.getKeyCode() == KeyEvent.VK_UP)
-                  cameraPos = cameraPos.translate(0, 0.02f/zoom, 0);
+                  cameraPos = cameraPos.translate(0, 0.1f/zoom, 0);
               else if (ev.getKeyCode() == KeyEvent.VK_DOWN)
-                  cameraPos = cameraPos.translate(0, -0.02f/zoom, 0);
+                  cameraPos = cameraPos.translate(0, -0.1f/zoom, 0);
               else if (ev.getKeyCode() == KeyEvent.VK_SPACE)
-                  zoom *= 1.01;
+                  zoom *= 1.05;
               else if (ev.getKeyCode() == KeyEvent.VK_Z)
-            	  zoom /= 1.01;
+            	  zoom /= 1.05;
               else if (ev.getKeyCode() == KeyEvent.VK_A)
-            	  rotateY -= 1;
+            	  rotateY += 10;
               else if (ev.getKeyCode() == KeyEvent.VK_D)
-            	  rotateY += 1;
+            	  rotateY -= 10;
               else if (ev.getKeyCode() == KeyEvent.VK_W)
-            	  rotateX -= 1;
+            	  rotateX -= 10;
               else if (ev.getKeyCode() == KeyEvent.VK_S)
-            	  rotateX += 1;
+            	  rotateX += 10;
               else if (ev.getKeyCode() == KeyEvent.VK_E)
-            	  rotateZ -= 1;
+            	  rotateZ -= 10;
               else if (ev.getKeyCode() == KeyEvent.VK_R)
-            	  rotateZ += 1;
+            	  rotateZ += 10;
           }
 		});
 		
-		shader.use(gl);
 	}
 
 	@Override
 	public void display(GL3 gl) {
 		super.display(gl);
 
-		terrain.init(gl);
+		//terrain.init(gl);
 		Matrix4 viewMatrix = Matrix4.scale(1/aspectRatio, 1, 1)
 				.multiply(Matrix4.scale(1/zoom, 1/zoom, 1))
 				.multiply(Matrix4.rotationX(-rotateX))
@@ -113,7 +125,10 @@ public class World extends Application3D {
 		Shader.setColor(gl, "diffuseCoeff", new Color(0.5f, 0.5f, 0.5f));
 		Shader.setColor(gl, "specularCoeff", new Color(0.8f, 0.8f, 0.8f));
 		Shader.setFloat(gl, "phongExp", 16f);
+		Shader.setColor(gl, "sunlightIntensity", Color.YELLOW);
+		
 		Shader.setPenColor(gl, Color.GREEN);
+		
     	terrain.draw(gl);
 	}
 
