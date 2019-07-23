@@ -51,6 +51,8 @@ public class TriangleMesh {
      * Contains the normals for all vertices.
      */
     private Point3DBuffer normals;
+    
+    private Point2DBuffer texCoords;
 
     /**
      * Contains indices into the buffer of vertices and normals. Each set of 3
@@ -70,6 +72,7 @@ public class TriangleMesh {
      */
     private int normalsName;
 
+    private int texCoordsName;
     /**
      * The name of the indices buffer according to OpenGL
      */
@@ -106,6 +109,25 @@ public class TriangleMesh {
             computeVertexNormals();
         }
     }
+    
+    /**
+     * Create a triangle mesh with the given list of vertices and indices and texture coordinates. The
+     * third argument indicates whether to generate vertex normals. If false,
+     * no normals are generated.
+     * @param vertices
+     * @param indices
+     * @param vertexNormals
+     */
+    public TriangleMesh(List<Point3D> vertices, List<Integer> indices, List<Point2D> texCoords, boolean vertexNormals) {
+        this.vertices = new Point3DBuffer(vertices);
+        this.indices = GLBuffers.newDirectIntBuffer(ArrayUtils.toPrimitive(indices.toArray(new Integer[0])));
+        normals = new Point3DBuffer(vertices.size());
+        if (vertexNormals) {
+            computeVertexNormals();
+        }
+        this.texCoords = new Point2DBuffer(texCoords);
+    }
+    
 
     /**
      * Create a triangle mesh with the given list of vertices (assumed to be in
@@ -269,11 +291,12 @@ public class TriangleMesh {
 
     public void init(GL3 gl) {
         // Generate the names for the buffers.
-        int[] names = new int[3];
-        gl.glGenBuffers(3, names, 0);
+        int[] names = new int[4];
+        gl.glGenBuffers(4, names, 0);
         verticesName = names[0];
         indicesName = names[1];
         normalsName = names[2];
+        texCoordsName = names[3];
 
         gl.glEnable(GL.GL_CULL_FACE);
         // Copy the data for the vertices
@@ -286,6 +309,13 @@ public class TriangleMesh {
             gl.glBindBuffer(GL.GL_ARRAY_BUFFER, normalsName);
             gl.glBufferData(GL.GL_ARRAY_BUFFER,
                     normals.capacity() * 3 * Float.BYTES, normals.getBuffer(),
+                    GL.GL_STATIC_DRAW);
+        }
+        
+        if (texCoords != null) {
+            gl.glBindBuffer(GL.GL_ARRAY_BUFFER, texCoordsName);
+            gl.glBufferData(GL.GL_ARRAY_BUFFER,
+                    texCoords.capacity() * 2 * Float.BYTES, texCoords.getBuffer(),
                     GL.GL_STATIC_DRAW);
         }
 
@@ -306,6 +336,12 @@ public class TriangleMesh {
             gl.glBindBuffer(GL.GL_ARRAY_BUFFER, normalsName);
             gl.glVertexAttribPointer(Shader.NORMAL, 3, GL.GL_FLOAT, false, 0, 0);
         }
+        
+        if (texCoords != null) {
+            gl.glBindBuffer(GL.GL_ARRAY_BUFFER, texCoordsName);
+            gl.glVertexAttribPointer(Shader.TEX_COORD, 2, GL.GL_FLOAT, false, 0, 0);
+        }
+
         Shader.setModelMatrix(gl, frame.getMatrix());
         Shader.setPenColor(gl, Color.BLUE);
         
@@ -318,7 +354,7 @@ public class TriangleMesh {
     }
 
     public void destroy(GL3 gl) {
-        gl.glDeleteBuffers(3, new int[] { verticesName, indicesName, normalsName }, 0);
+        gl.glDeleteBuffers(4, new int[] { verticesName, indicesName, normalsName, texCoordsName }, 0);
     }
 
     public void draw(GL3 gl) {

@@ -68,14 +68,14 @@ public class ModelViewer extends Application3D {
 
 //        Shader shader = null;
 //        if (USE_CUBEMAP) {
-//            shader = new Shader(gl, "shaders/vertex_phong.glsl",
+//         		shader = new Shader(gl, "shaders/vertex_phong.glsl",
 //                    "shaders/fragment_cubemap.glsl");
 //        } else if (USE_LIGHTING && USE_TEXTURE) {
 //            shader = new Shader(gl, "shaders/vertex_tex_phong.glsl",
 //                    "shaders/fragment_tex_phong.glsl");
 //        } else if (USE_LIGHTING) {
-//            shader = new Shader(gl, "shaders/vertex_phong.glsl",
-//                    "shaders/fragment_phong.glsl");
+            Shader shader = new Shader(gl, "shaders/vertex_phong.glsl",
+                    "shaders/fragment_phong.glsl");
 //        } else if (USE_TEXTURE) {
 //            shader = new Shader(gl, "shaders/vertex_tex_3d.glsl",
 //                    "shaders/fragment_tex_3d.glsl");
@@ -83,7 +83,7 @@ public class ModelViewer extends Application3D {
 //            shader = new Shader(gl, "shaders/vertex_3d.glsl", "shaders/fragment_3d.glsl");
 //        }
 //
-//        shader.use(gl);
+        shader.use(gl);
     }
 
     @Override
@@ -164,7 +164,7 @@ public class ModelViewer extends Application3D {
         // A blue base for the model to sit on.
         CoordFrame3D baseFrame =
                 frame.translate(0, -0.5f, 0).scale(0.5f, 0.5f, 0.5f);
-        if (!USE_TEXTURE && !USE_CUBEMAP)
+       // if (!USE_TEXTURE && !USE_CUBEMAP)
             Shader.setPenColor(gl, Color.BLUE);
         base.draw(gl, baseFrame);
 
