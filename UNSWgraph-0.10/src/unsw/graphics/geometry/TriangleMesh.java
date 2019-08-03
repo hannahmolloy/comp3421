@@ -295,7 +295,7 @@ public class TriangleMesh {
         normalsName = names[2];
         texCoordsName = names[3];
 
-        gl.glEnable(GL.GL_CULL_FACE);
+     //   gl.glEnable(GL.GL_CULL_FACE);
         // Copy the data for the vertices
         gl.glBindBuffer(GL.GL_ARRAY_BUFFER, verticesName);
         gl.glBufferData(GL.GL_ARRAY_BUFFER,

@@ -194,7 +194,8 @@ public class Terrain {
      * @param z
      */
     public void addRoad(float width, List<Point2D> spine) {
-        Road road = new Road(width, spine);
+    	float altitude = altitude(spine.get(0).getX(), spine.get(0).getY());
+        Road road = new Road(width, spine, altitude);
         roads.add(road);        
     }
 
@@ -254,7 +255,9 @@ public class Terrain {
         Shader.setInt(gl, "tex", 0);
     	gl.glActiveTexture(GL.GL_TEXTURE0);
     	gl.glBindTexture(GL.GL_TEXTURE_2D, terrainTex.getId());
+
     	
+    	mesh.draw(gl);
     	for (Tree t : trees) {
     		CoordFrame3D frame = CoordFrame3D.identity()
     					.translate(t.getPosition())
@@ -262,6 +265,10 @@ public class Terrain {
     					.scale(0.2f, 0.2f, 0.2f);
     		t.draw(gl, frame);
     	}
-    	mesh.draw(gl);
+    	
+    	for (Road r : roads) {
+    		CoordFrame3D frame = CoordFrame3D.identity();
+    		r.draw(gl, frame);
+    	}
     }
 }
