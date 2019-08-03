@@ -10,7 +10,7 @@ import com.jogamp.opengl.GL3;
 import unsw.graphics.Application3D;
 import unsw.graphics.Matrix4;
 import unsw.graphics.Shader;
-import unsw.graphics.scene.Camera;
+import unsw.graphics.scene.Camera3D;
 import unsw.graphics.geometry.Point3D;
 
 import com.jogamp.newt.event.KeyAdapter;
@@ -25,7 +25,8 @@ public class World extends Application3D {
 
     private Terrain terrain;
     private Point3D cameraPos;
-    private Camera camera;
+    private float cameraRot;
+    private Camera3D camera;
     private float zoom;
     private float aspectRatio;
     private int rotateX, rotateY, rotateZ;
@@ -35,11 +36,11 @@ public class World extends Application3D {
         this.terrain = terrain;
         aspectRatio = 1;
     	cameraPos = new Point3D(0,0.5f,9);
-    	zoom = 0.5f;
+    	zoom = 1.0f;
     	rotateX = 0;
     	rotateY = 0;
     	rotateZ = 0;
-    	camera = new Camera(terrain, cameraPos);
+    	camera = new Camera3D(terrain, cameraPos);
     }
    
     /**
@@ -66,50 +67,55 @@ public class World extends Application3D {
 		//Shader shader = new Shader(gl, "shaders/vertex_phong.glsl", "shaders/fragment_phong.glsl");
 		Shader shader = new Shader(gl, "shaders/vertex_tex_phong.glsl", "shaders/fragment_tex_phong.glsl");
 		shader.use(gl);
-		getWindow().addKeyListener(new KeyAdapter() {
-          @Override
-          public void keyPressed(KeyEvent ev) {
-        	  
-              if (ev.getKeyCode() == KeyEvent.VK_LEFT)
-                  cameraPos = cameraPos.translate(-0.1f/zoom, 0, 0);
-              else if (ev.getKeyCode() == KeyEvent.VK_RIGHT)
-                  cameraPos = cameraPos.translate(0.1f/zoom, 0, 0);
-              else if (ev.getKeyCode() == KeyEvent.VK_UP)
-                  cameraPos = cameraPos.translate(0, 0.1f/zoom, 0);
-              else if (ev.getKeyCode() == KeyEvent.VK_DOWN)
-                  cameraPos = cameraPos.translate(0, -0.1f/zoom, 0);
-              else if (ev.getKeyCode() == KeyEvent.VK_SPACE)
-                  zoom *= 1.05;
-              else if (ev.getKeyCode() == KeyEvent.VK_Z)
-            	  zoom /= 1.05;
-              else if (ev.getKeyCode() == KeyEvent.VK_A)
-            	  rotateY += 10;
-              else if (ev.getKeyCode() == KeyEvent.VK_D)
-            	  rotateY -= 10;
-              else if (ev.getKeyCode() == KeyEvent.VK_W)
-            	  rotateX -= 10;
-              else if (ev.getKeyCode() == KeyEvent.VK_S)
-            	  rotateX += 10;
-              else if (ev.getKeyCode() == KeyEvent.VK_E)
-            	  rotateZ -= 10;
-              else if (ev.getKeyCode() == KeyEvent.VK_R)
-            	  rotateZ += 10;
-          }
-		});
+		
+		getWindow().addKeyListener(camera);
+		
+//		getWindow().addKeyListener(new KeyAdapter() {
+//          @Override
+//          public void keyPressed(KeyEvent ev) {
+//        	  
+//              if (ev.getKeyCode() == KeyEvent.VK_LEFT)
+//                  cameraPos = cameraPos.translate(-0.1f/zoom, 0, 0);
+//              else if (ev.getKeyCode() == KeyEvent.VK_RIGHT)
+//                  cameraPos = cameraPos.translate(0.1f/zoom, 0, 0);
+//              else if (ev.getKeyCode() == KeyEvent.VK_UP)
+//                  cameraPos = cameraPos.translate(0, 0.1f/zoom, 0);
+//              else if (ev.getKeyCode() == KeyEvent.VK_DOWN)
+//                  cameraPos = cameraPos.translate(0, -0.1f/zoom, 0);
+//              else if (ev.getKeyCode() == KeyEvent.VK_SPACE)
+//                  zoom *= 1.05;
+//              else if (ev.getKeyCode() == KeyEvent.VK_Z)
+//            	  zoom /= 1.05;
+//              else if (ev.getKeyCode() == KeyEvent.VK_A)
+//            	  rotateY += 10;
+//              else if (ev.getKeyCode() == KeyEvent.VK_D)
+//            	  rotateY -= 10;
+//              else if (ev.getKeyCode() == KeyEvent.VK_W)
+//            	  rotateX -= 10;
+//              else if (ev.getKeyCode() == KeyEvent.VK_S)
+//            	  rotateX += 10;
+//              else if (ev.getKeyCode() == KeyEvent.VK_E)
+//            	  rotateZ -= 10;
+//              else if (ev.getKeyCode() == KeyEvent.VK_R)
+//            	  rotateZ += 10;
+//          }
+//		});
 		
 	}
 
 	@Override
 	public void display(GL3 gl) {
 		super.display(gl);
-
+		
+		updateCamera();
+		
 		//terrain.init(gl);
 		Matrix4 viewMatrix = Matrix4.scale(1/aspectRatio, 1, 1)
 				.multiply(Matrix4.scale(1/zoom, 1/zoom, 1))
-				.multiply(Matrix4.rotationX(-rotateX))
-				.multiply(Matrix4.rotationY(-rotateY))
-				.multiply(Matrix4.rotationZ(-rotateZ))
-    			.multiply(Matrix4.translation(-cameraPos.getX(), -cameraPos.getY(), -cameraPos.getZ()));
+				//.multiply(Matrix4.rotationX(-rotateX))
+				.multiply(Matrix4.rotationY(-cameraRot))
+				//.multiply(Matrix4.rotationZ(-rotateZ))
+    			.multiply(Matrix4.translation(-cameraPos.getX(), -cameraPos.getY() + 1, -cameraPos.getZ()));
     	
     	Matrix4 projMatrix = Matrix4.perspective(60, 1, 1, 100);
         
@@ -142,5 +148,10 @@ public class World extends Application3D {
 	public void reshape(GL3 gl, int width, int height) {
         super.reshape(gl, width, height);
         Shader.setProjMatrix(gl, Matrix4.perspective(60, width/(float)height, 1, 100));
+	}
+	
+	public void updateCamera() {
+		this.cameraPos = camera.getCameraPosition();
+		this.cameraRot = camera.getCameraYRot();
 	}
 }
