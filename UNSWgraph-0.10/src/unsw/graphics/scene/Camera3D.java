@@ -174,15 +174,15 @@ public class Camera3D extends SceneObject implements KeyListener{
 	
 	private void moveForward() {
 		float x = (float) Math.sin(-1*Math.toRadians(yRotation));
-		float z = (float) (-1*Math.cos(-1*Math.toRadians(yRotation)));
+		float z = (float) (-1*Math.cos(Math.toRadians(yRotation)));
 		float y = terrain.altitude(x + position.getX(), z + position.getZ())
 				- position.getY() + distance;
 		this.position = this.position.translate(x, y, z);
 	}
 
 	private void moveBackward() {
-		float x = (float) Math.sin(-1*Math.toRadians(yRotation));
-		float z = (float) Math.cos(-1*Math.toRadians(yRotation));
+		float x = (float) Math.sin(Math.toRadians(yRotation));
+		float z = (float) Math.cos(Math.toRadians(yRotation));
 		float y = terrain.altitude(x + position.getX(), z + position.getZ())
 				- position.getY() + distance;
 		this.position = this.position.translate(x, y, z);
