@@ -142,40 +142,26 @@ public class Camera3D extends SceneObject implements KeyListener{
 	}
 	
 	private void moveForward() {
-		System.out.println("current rotation" + yRotation);
-	 	System.out.println("current pos" + position.getX() + " "  + position.getZ());
-	 	
 		float x = (float) Math.sin(-1*Math.toRadians(yRotation));
 		float z = (float) (-1*Math.cos(-1*Math.toRadians(yRotation)));
 		float y = terrain.altitude(x + position.getX(), z + position.getY())
 				- position.getY() + 1;
 		this.position = this.position.translate(x, y, z);
-		System.out.println("Y" + position.getY());
 	}
 
 	private void moveBackward() {
-		System.out.println("current rotation" + yRotation);
-	 	System.out.println("current pos" + position.getX() + " "  + position.getZ());
-	 	
 		float x = (float) Math.sin(-1*Math.toRadians(yRotation));
 		float z = (float) Math.cos(-1*Math.toRadians(yRotation));
 		float y = terrain.altitude(x + position.getX(), z + position.getY())
 				- position.getY() + 1;
 		this.position = this.position.translate(x, y, z);
-		System.out.println("Y" + position.getY());
 	}
 	
 	private void turnLeft() {
-		System.out.println("current rotation" + yRotation);
-	 	System.out.println("current pos" + position.getX() + " "  + position.getZ());
-	 	
 		this.yRotation = yRotation + 5.0f;
 	}
 	
 	private void turnRight() {
-		System.out.println("current rotation" + yRotation);
-	 	System.out.println("current pos" + position.getX() + " "  + position.getZ());
-	 	
 		this.yRotation = yRotation - 5.0f;
 		
 	}

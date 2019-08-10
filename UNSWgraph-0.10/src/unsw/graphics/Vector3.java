@@ -104,7 +104,7 @@ public class Vector3 {
         return new Vector3(values[0] * s, values[1] * s, values[2] * s);
     }
 
-    private float length() {
+    public float length() {
         return (float) Math.sqrt(values[0]*values[0] + values[1]*values[1] + values[2]*values[2]);
     }
 
