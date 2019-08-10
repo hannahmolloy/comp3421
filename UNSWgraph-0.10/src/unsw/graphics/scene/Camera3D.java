@@ -36,8 +36,12 @@ public class Camera3D extends SceneObject implements KeyListener{
     
     private Point3D position;
     private float yRotation;
+    private float xRotation;
+    private float zoom;
     
     private Terrain terrain;
+    private boolean thirdPerson;
+    private int distance;
     
 //    public Camera3D(SceneObject parent, Point3D position, Terrain terrain) {
 //    	super();
@@ -55,6 +59,9 @@ public class Camera3D extends SceneObject implements KeyListener{
         near = 1.0f;
         far = 100.0f;
         fieldOfView = 60.0f;
+        zoom = 0.1f;
+        thirdPerson = false;
+        distance = 2;
     }
 
     public void setView(GL3 gl) {
@@ -67,7 +74,7 @@ public class Camera3D extends SceneObject implements KeyListener{
     	
     	CoordFrame3D frame = CoordFrame3D.identity();
 		frame = frame.rotateY(-yRotation);
-		frame = frame.translate(-1*position.getX(),-1*position.getY(),-1*position.getZ());
+		frame = frame.translate(-1*position.getX(),-1*position.getY() + 0.05f,-1*position.getZ());
 		
 		Shader.setViewMatrix(gl, frame.getMatrix());
     	
@@ -128,32 +135,56 @@ public class Camera3D extends SceneObject implements KeyListener{
 		if(key == KeyEvent.VK_RIGHT) {
 			turnRight();
 		}
+		if(key == KeyEvent.VK_W) {
+			lookUp();
+		}
+		if(key == KeyEvent.VK_S) {
+			lookDown();
+		}
+		if(key == KeyEvent.VK_E) {
+			zoomIn();
+		}
+		if(key == KeyEvent.VK_D) {
+			zoomOut();
+		}
+		if(key == KeyEvent.VK_3) {
+			changeThirdPerson();
+		}
 //		if(keyCode == KeyEvent.VK_T) {
 //			System.out.println("torch");
 //			torch = !torch;
 //		}
 		
 	}
-
-	@Override
-	public void keyReleased(KeyEvent arg0) {
-		// TODO Auto-generated method stub
-		
+	
+	private void changeThirdPerson() {
+		if (!thirdPerson) {
+			distance = 4;
+			moveBackward();
+			moveBackward();
+			this.position.translate(0, distance, 0);
+		} else {
+			distance = 2;
+			moveForward();
+			moveForward();
+			this.position.translate(0, distance, 0);
+		}
+		thirdPerson = !thirdPerson;
 	}
 	
 	private void moveForward() {
 		float x = (float) Math.sin(-1*Math.toRadians(yRotation));
 		float z = (float) (-1*Math.cos(-1*Math.toRadians(yRotation)));
-		float y = terrain.altitude(x + position.getX(), z + position.getY())
-				- position.getY() + 1;
+		float y = terrain.altitude(x + position.getX(), z + position.getZ())
+				- position.getY() + distance;
 		this.position = this.position.translate(x, y, z);
 	}
 
 	private void moveBackward() {
 		float x = (float) Math.sin(-1*Math.toRadians(yRotation));
 		float z = (float) Math.cos(-1*Math.toRadians(yRotation));
-		float y = terrain.altitude(x + position.getX(), z + position.getY())
-				- position.getY() + 1;
+		float y = terrain.altitude(x + position.getX(), z + position.getZ())
+				- position.getY() + distance;
 		this.position = this.position.translate(x, y, z);
 	}
 	
@@ -166,11 +197,50 @@ public class Camera3D extends SceneObject implements KeyListener{
 		
 	}
 	
+	private void lookUp() {
+		System.out.println("current rotation" + yRotation + " " + xRotation);
+	 	System.out.println("current pos" + position.getX() + " "  + position.getZ());
+	 	
+		this.xRotation = xRotation + 5.0f;
+	}
+	
+	private void lookDown() {
+		System.out.println("current rotation" + yRotation + " " + xRotation);
+	 	System.out.println("current pos" + position.getX() + " "  + position.getZ());
+	 	
+		this.xRotation = xRotation - 5.0f;
+	}
+	
+	private void zoomIn() {
+		this.zoom = this.zoom + 0.05f;
+	}
+	
+	private void zoomOut() {
+		if(this.zoom - 0.05f <= 0.1f) {
+			this.zoom = 0.1f;
+		}
+		else {
+			this.zoom = this.zoom - 0.05f;
+		}	
+	}
+	
 	public Point3D getCameraPosition() {
 		return this.position;
 	}
 	
 	public float getCameraYRot() {
 		return this.yRotation;
+	}
+	public float getCameraXRot() {
+		return this.xRotation;
+	}
+	public float getZoom() {
+		return this.zoom;
+	}
+
+	@Override
+	public void keyReleased(KeyEvent arg0) {
+		// TODO Auto-generated method stub
+		
 	}
 }
