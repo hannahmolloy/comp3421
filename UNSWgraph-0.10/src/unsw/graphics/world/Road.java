@@ -1,8 +1,19 @@
 package unsw.graphics.world;
 
+import java.awt.Color;
+import java.util.ArrayList;
 import java.util.List;
 
+import com.jogamp.opengl.GL;
+import com.jogamp.opengl.GL3;
+
+import unsw.graphics.CoordFrame3D;
+import unsw.graphics.Shader;
+import unsw.graphics.Texture;
+import unsw.graphics.Vector3;
 import unsw.graphics.geometry.Point2D;
+import unsw.graphics.geometry.Point3D;
+import unsw.graphics.geometry.TriangleMesh;
 
 /**
  * COMMENT: Comment Road 
@@ -11,8 +22,14 @@ import unsw.graphics.geometry.Point2D;
  */
 public class Road {
 
-    private List<Point2D> points;
+    private List<Point2D> controlPoints;
     private float width;
+   // private List<TriangleMesh> meshes;
+    private TriangleMesh mesh;
+    private Texture tex;
+    private Integer numSlices;
+    private float altitude;
+    private List<Point3D> points;
     
     /**
      * Create a new road with the specified spine 
@@ -20,12 +37,88 @@ public class Road {
      * @param width
      * @param spine
      */
-    public Road(float width, List<Point2D> spine) {
+    public Road(float width, List<Point2D> spine, float altitude) {
         this.width = width;
-        this.points = spine;
+        this.controlPoints = spine;
+        this.altitude = altitude;
+        numSlices = 10;
+       // meshes = createMeshes();
+		points = new ArrayList<Point3D>();
+        mesh = createMesh();
+
     }
 
-    /**
+//    private List<TriangleMesh> createMeshes() {
+//    	List<TriangleMesh> meshes = new ArrayList<TriangleMesh>();
+//    	for (int segment = 0; segment < size(); segment++) {
+//    		meshes.add(createMesh(segment));
+//    	}
+//		return meshes;
+//	}
+
+	private TriangleMesh createMesh() {
+    	float t;
+
+    	List<Point3D> extendedPoints = new ArrayList<Point3D>();
+    	List<Integer> indices = new ArrayList<Integer>();
+    	List<Point2D> texCoords = new ArrayList<Point2D>();
+    	
+		for (int segment = 0; segment < size(); segment++) {
+
+			t = segment*numSlices;
+			for (int slices = 0; slices < numSlices; slices++) {
+				t = (float)slices/numSlices + segment;
+				Point2D p = point(t);
+				points.add(new Point3D (p.getX(), altitude, p.getY()));
+			}
+		}
+		
+		int index = 0;
+		for (Point3D p : points) {
+			Point3D p1 = null;
+			Vector3 tangent = null;
+			if (index < points.size() - 1) {
+    			int bottomLeft = index*2;
+    			int topLeft = (index+1)*2;
+    			int bottomRight = index*2 + 1;
+    			int topRight = (index+1)*2 + 1;
+
+    			indices.add(bottomLeft);
+    			indices.add(topLeft);
+    			indices.add(topRight);
+
+    			indices.add(bottomLeft);
+    			indices.add(topRight);
+    			indices.add(bottomRight);
+    			
+				p1 = points.get(index+1);
+
+    			tangent = new Vector3((p1.getX() - p.getX()), altitude, (p1.getZ() - p.getZ()));
+    			
+    			index++;
+			} else {
+				p1 = points.get(index-1);
+
+				tangent = new Vector3((p1.getX() - p.getX()), altitude, (p1.getZ() - p.getZ())).negate();
+			}
+
+			Vector3 normal = new Vector3(-tangent.getZ(), 0.01f, tangent.getX()).normalize().scale(width/2f);
+			
+			Point3D pLeft = p.translate(normal);
+			Point3D pRight = p.translate(normal.negate());
+			System.out.println(p.getX() + " " + p.getZ());
+			System.out.println(pLeft.getX() + " " + pLeft.getZ() + " " + pRight.getX() + " " + pRight.getZ());
+			extendedPoints.add(new Point3D(pLeft.getX(), altitude+0.01f, pLeft.getZ()));
+			extendedPoints.add(new Point3D(pRight.getX(), altitude+0.01f, pRight.getZ()));	
+			
+			texCoords.add(new Point2D(pLeft.getX(), pLeft.getZ()));
+			texCoords.add(new Point2D(pRight.getX(), pRight.getZ()));
+		}
+
+		return new TriangleMesh(extendedPoints, indices, texCoords, true);
+	}
+
+	/**
      * The width of the road.
      * 
      * @return
@@ -40,7 +133,7 @@ public class Road {
      * @return
      */
     public int size() {
-        return points.size() / 3;
+        return controlPoints.size() / 3;
     }
 
     /**
@@ -50,7 +143,7 @@ public class Road {
      * @return
      */
     public Point2D controlPoint(int i) {
-        return points.get(i);
+        return controlPoints.get(i);
     }
     
     /**
@@ -66,10 +159,10 @@ public class Road {
         
         i *= 3;
         
-        Point2D p0 = points.get(i++);
-        Point2D p1 = points.get(i++);
-        Point2D p2 = points.get(i++);
-        Point2D p3 = points.get(i++);
+        Point2D p0 = controlPoints.get(i++);
+        Point2D p1 = controlPoints.get(i++);
+        Point2D p2 = controlPoints.get(i++);
+        Point2D p3 = controlPoints.get(i++);
         
 
         float x = b(0, t) * p0.getX() + b(1, t) * p1.getX() + b(2, t) * p2.getX() + b(3, t) * p3.getX();
@@ -105,6 +198,15 @@ public class Road {
         // this should never happen
         throw new IllegalArgumentException("" + i);
     }
+    
+    public void draw(GL3 gl, CoordFrame3D frame) {
+    	tex = new Texture(gl, "res/textures/sky.bmp","bmp", true);
 
-
+        Shader.setInt(gl, "tex", 1);
+    	gl.glActiveTexture(GL.GL_TEXTURE1);
+    	gl.glBindTexture(GL.GL_TEXTURE_2D, tex.getId());
+    	
+    	mesh.init(gl);
+    	mesh.draw(gl);
+    }
 }

@@ -213,7 +213,7 @@ public class Shader {
     
     /**
      * Set an arbitrary uniform variable of type 'vec3' with the given
-     * Point3D
+     * Vector3
      * @param gl
      * @param var
      * @param point3d

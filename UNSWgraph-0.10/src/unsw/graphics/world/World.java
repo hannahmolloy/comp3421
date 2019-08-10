@@ -36,8 +36,10 @@ public class World extends Application3D {
     	super("Assignment 2", 800, 600);
         this.terrain = terrain;
         aspectRatio = 1;
-    	cameraPos = new Point3D(0,0.5f,9);
-    	zoom = 0.5f;
+
+    	cameraPos = new Point3D(3,5,15);
+    	zoom = 1.0f;
+
     	rotateX = 0;
     	rotateY = 0;
     	rotateZ = 0;

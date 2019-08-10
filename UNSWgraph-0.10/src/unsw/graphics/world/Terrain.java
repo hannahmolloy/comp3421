@@ -47,10 +47,6 @@ public class Terrain {
     }
     
     public void init(GL3 gl) {
-    	Shader shader = new Shader(gl, "shaders/vertex_tex_3d.glsl",
-             "shaders/fragment_tex_3d.glsl");
-    	shader.use(gl);
-	 
     	mesh = createMesh(gl);
     	mesh.init(gl);
     }
@@ -186,7 +182,6 @@ public class Terrain {
         trees.add(tree);
     }
 
-
     /**
      * Add a road. 
      * 
@@ -194,7 +189,8 @@ public class Terrain {
      * @param z
      */
     public void addRoad(float width, List<Point2D> spine) {
-        Road road = new Road(width, spine);
+    	float altitude = altitude(spine.get(0).getX(), spine.get(0).getY());
+        Road road = new Road(width, spine, altitude);
         roads.add(road);        
     }
 
@@ -212,9 +208,6 @@ public class Terrain {
     	
     	for (row = 0; row < depth; row++) {
     		for (col = 0; col < width; col++) {
-    			
-    			texCoords.add(new Point2D(row, col));
-    			
     			/* for each square of points 
     			 * two triangles need to be made
     			 * 	topLeft  	topRight
@@ -227,6 +220,7 @@ public class Terrain {
     			 */
 
     			points.add(new Point3D(row, (float)altitude(row, col), col));
+    			texCoords.add(new Point2D(row, col));
     			
     			if (row < depth - 1 && col < width - 1) {
     				int topLeft = (int) (row * width + col);
@@ -254,7 +248,8 @@ public class Terrain {
         Shader.setInt(gl, "tex", 0);
     	gl.glActiveTexture(GL.GL_TEXTURE0);
     	gl.glBindTexture(GL.GL_TEXTURE_2D, terrainTex.getId());
-    	
+
+    	mesh.draw(gl);
     	for (Tree t : trees) {
     		CoordFrame3D frame = CoordFrame3D.identity()
     					.translate(t.getPosition())
@@ -262,6 +257,10 @@ public class Terrain {
     					.scale(0.2f, 0.2f, 0.2f);
     		t.draw(gl, frame);
     	}
-    	mesh.draw(gl);
+    	
+    	for (Road r : roads) {
+    		CoordFrame3D frame = CoordFrame3D.identity();
+    		r.draw(gl, frame);
+    	}
     }
 }
