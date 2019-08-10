@@ -84,6 +84,7 @@ public class TriangleMesh {
      */
     public TriangleMesh(List<Point3D> vertices, List<Vector3> normals, List<Integer> indices) {
         this(vertices, indices, false);
+        this.normals = new Point3DBuffer(normals.size());
         for (int i = 0; i < normals.size(); i++) {
             Vector3 n = normals.get(i);
             this.normals.put(i, n.getX(), n.getY(), n.getZ());
@@ -151,12 +152,7 @@ public class TriangleMesh {
     public TriangleMesh(String plyFile) throws IOException {
         this(plyFile, false);
     }
-    
-    public TriangleMesh(Point3D... points) {
-    	/*
-    	 * create new meshes from the points and normals
-    	 */
-    }
+
 
     /**
      * Construct a triangle with the given PLY file. The third argument
@@ -329,6 +325,7 @@ public class TriangleMesh {
 
         gl.glBindBuffer(GL.GL_ARRAY_BUFFER, verticesName);
         gl.glVertexAttribPointer(Shader.POSITION, 3, GL.GL_FLOAT, false, 0, 0);
+        
         if (normals != null) {
             gl.glBindBuffer(GL.GL_ARRAY_BUFFER, normalsName);
             gl.glVertexAttribPointer(Shader.NORMAL, 3, GL.GL_FLOAT, false, 0, 0);

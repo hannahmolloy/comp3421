@@ -36,6 +36,8 @@ public class Camera3D extends SceneObject implements KeyListener{
     
     private Point3D position;
     private float yRotation;
+    private float xRotation;
+    private float zoom;
     
     private Terrain terrain;
     
@@ -55,6 +57,7 @@ public class Camera3D extends SceneObject implements KeyListener{
         near = 1.0f;
         far = 100.0f;
         fieldOfView = 60.0f;
+        zoom = 0.1f;
     }
 
     public void setView(GL3 gl) {
@@ -67,7 +70,7 @@ public class Camera3D extends SceneObject implements KeyListener{
     	
     	CoordFrame3D frame = CoordFrame3D.identity();
 		frame = frame.rotateY(-yRotation);
-		frame = frame.translate(-1*position.getX(),-1*position.getY(),-1*position.getZ());
+		frame = frame.translate(-1*position.getX(),-1*position.getY() + 0.05f,-1*position.getZ());
 		
 		Shader.setViewMatrix(gl, frame.getMatrix());
     	
@@ -128,6 +131,19 @@ public class Camera3D extends SceneObject implements KeyListener{
 		if(key == KeyEvent.VK_RIGHT) {
 			turnRight();
 		}
+		if(key == KeyEvent.VK_W) {
+			lookUp();
+		}
+		if(key == KeyEvent.VK_S) {
+			lookDown();
+		}
+		if(key == KeyEvent.VK_E) {
+			zoomIn();
+		}
+		if(key == KeyEvent.VK_D) {
+			zoomOut();
+		}
+		
 //		if(keyCode == KeyEvent.VK_T) {
 //			System.out.println("torch");
 //			torch = !torch;
@@ -180,11 +196,46 @@ public class Camera3D extends SceneObject implements KeyListener{
 		
 	}
 	
+	private void lookUp() {
+		System.out.println("current rotation" + yRotation + " " + xRotation);
+	 	System.out.println("current pos" + position.getX() + " "  + position.getZ());
+	 	
+		this.xRotation = xRotation + 5.0f;
+	}
+	
+	private void lookDown() {
+		System.out.println("current rotation" + yRotation + " " + xRotation);
+	 	System.out.println("current pos" + position.getX() + " "  + position.getZ());
+	 	
+		this.xRotation = xRotation - 5.0f;
+	}
+	
+	private void zoomIn() {
+		this.zoom = this.zoom + 0.05f;
+	}
+	
+	private void zoomOut() {
+		if(this.zoom - 0.05f <= 0.1f) {
+			this.zoom = 0.1f;
+		}
+		else {
+			this.zoom = this.zoom - 0.05f;
+		}
+		
+	}
+	
+	
 	public Point3D getCameraPosition() {
 		return this.position;
 	}
 	
 	public float getCameraYRot() {
 		return this.yRotation;
+	}
+	public float getCameraXRot() {
+		return this.xRotation;
+	}
+	public float getZoom() {
+		return this.zoom;
 	}
 }

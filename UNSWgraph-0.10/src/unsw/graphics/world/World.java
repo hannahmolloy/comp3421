@@ -30,13 +30,14 @@ public class World extends Application3D {
     private float zoom;
     private float aspectRatio;
     private int rotateX, rotateY, rotateZ;
+	private float cameraXRot;
 
     public World(Terrain terrain) {
     	super("Assignment 2", 800, 600);
         this.terrain = terrain;
         aspectRatio = 1;
     	cameraPos = new Point3D(0,0.5f,9);
-    	zoom = 1.0f;
+    	zoom = 0.5f;
     	rotateX = 0;
     	rotateY = 0;
     	rotateZ = 0;
@@ -112,10 +113,10 @@ public class World extends Application3D {
 		//terrain.init(gl);
 		Matrix4 viewMatrix = Matrix4.scale(1/aspectRatio, 1, 1)
 				.multiply(Matrix4.scale(1/zoom, 1/zoom, 1))
-				//.multiply(Matrix4.rotationX(-rotateX))
+				.multiply(Matrix4.rotationX(-cameraXRot))
 				.multiply(Matrix4.rotationY(-cameraRot))
 				//.multiply(Matrix4.rotationZ(-rotateZ))
-    			.multiply(Matrix4.translation(-cameraPos.getX(), -cameraPos.getY() + 1, -cameraPos.getZ()));
+    			.multiply(Matrix4.translation(-cameraPos.getX(), -cameraPos.getY(), -cameraPos.getZ()));
     	
     	Matrix4 projMatrix = Matrix4.perspective(60, 1, 1, 100);
         
@@ -153,5 +154,7 @@ public class World extends Application3D {
 	public void updateCamera() {
 		this.cameraPos = camera.getCameraPosition();
 		this.cameraRot = camera.getCameraYRot();
+		this.cameraXRot = camera.getCameraXRot();
+		this.zoom = camera.getZoom();
 	}
 }
