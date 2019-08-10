@@ -3,11 +3,13 @@ package unsw.graphics.world;
 import java.awt.Color;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL3;
 
 import unsw.graphics.Application3D;
+import unsw.graphics.CoordFrame3D;
 import unsw.graphics.Matrix4;
 import unsw.graphics.Shader;
 import unsw.graphics.scene.Camera3D;
@@ -30,17 +32,19 @@ public class World extends Application3D {
     private float zoom;
     private float aspectRatio;
     private int rotateX, rotateY, rotateZ;
+    private Avatar dolphins;
 
     public World(Terrain terrain) {
     	super("Assignment 2", 800, 600);
         this.terrain = terrain;
         aspectRatio = 1;
-    	cameraPos = new Point3D(3,5,15);
+    	cameraPos = new Point3D(5,5,15);
     	zoom = 1.0f;
     	rotateX = 0;
-    	rotateY = 0;
+    	rotateY = 180;
     	rotateZ = 0;
     	camera = new Camera3D(terrain, cameraPos);
+    	dolphins = new Avatar();
     }
    
     /**
@@ -64,7 +68,6 @@ public class World extends Application3D {
 	public void init(GL3 gl) {
 		super.init(gl);
 		terrain.init(gl);
-		//Shader shader = new Shader(gl, "shaders/vertex_phong.glsl", "shaders/fragment_phong.glsl");
 		Shader shader = new Shader(gl, "shaders/vertex_tex_phong.glsl", "shaders/fragment_tex_phong.glsl");
 		shader.use(gl);
 		
@@ -109,7 +112,6 @@ public class World extends Application3D {
 		
 		updateCamera();
 		
-		//terrain.init(gl);
 		Matrix4 viewMatrix = Matrix4.scale(1/aspectRatio, 1, 1)
 				.multiply(Matrix4.scale(1/zoom, 1/zoom, 1))
 				//.multiply(Matrix4.rotationX(-rotateX))
@@ -117,7 +119,7 @@ public class World extends Application3D {
 				//.multiply(Matrix4.rotationZ(-rotateZ))
     			.multiply(Matrix4.translation(-cameraPos.getX(), -cameraPos.getY() + 1, -cameraPos.getZ()));
     	
-    	Matrix4 projMatrix = Matrix4.perspective(60, 1, 1, 100);
+    	Matrix4 projMatrix = Matrix4.perspective(60, 1, 0.1f, 100);
         
     	Shader.setViewMatrix(gl, viewMatrix);
     	Shader.setProjMatrix(gl, projMatrix);
@@ -133,9 +135,12 @@ public class World extends Application3D {
 		Shader.setFloat(gl, "phongExp", 16f);
 		Shader.setColor(gl, "sunlightIntensity", Color.YELLOW);
 		
-		Shader.setPenColor(gl, Color.GREEN);
-		
-    	terrain.draw(gl);
+    	try {
+			terrain.draw(gl);
+	    	dolphins.draw(gl, CoordFrame3D.identity().translate(5, 1, 5).rotateX(-90).scale(0.003f, 0.003f, 0.003f));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override

@@ -24,7 +24,6 @@ public class Road {
 
     private List<Point2D> controlPoints;
     private float width;
-   // private List<TriangleMesh> meshes;
     private TriangleMesh mesh;
     private Texture tex;
     private Integer numSlices;
@@ -41,21 +40,11 @@ public class Road {
         this.width = width;
         this.controlPoints = spine;
         this.altitude = altitude;
-        numSlices = 10;
-       // meshes = createMeshes();
+        numSlices = 100;
 		points = new ArrayList<Point3D>();
         mesh = createMesh();
-
     }
-
-//    private List<TriangleMesh> createMeshes() {
-//    	List<TriangleMesh> meshes = new ArrayList<TriangleMesh>();
-//    	for (int segment = 0; segment < size(); segment++) {
-//    		meshes.add(createMesh(segment));
-//    	}
-//		return meshes;
-//	}
-
+    
 	private TriangleMesh createMesh() {
     	float t;
 
@@ -106,8 +95,7 @@ public class Road {
 			
 			Point3D pLeft = p.translate(normal);
 			Point3D pRight = p.translate(normal.negate());
-			System.out.println(p.getX() + " " + p.getZ());
-			System.out.println(pLeft.getX() + " " + pLeft.getZ() + " " + pRight.getX() + " " + pRight.getZ());
+			
 			extendedPoints.add(new Point3D(pLeft.getX(), altitude+0.01f, pLeft.getZ()));
 			extendedPoints.add(new Point3D(pRight.getX(), altitude+0.01f, pRight.getZ()));	
 			
@@ -115,7 +103,7 @@ public class Road {
 			texCoords.add(new Point2D(pRight.getX(), pRight.getZ()));
 		}
 
-		return new TriangleMesh(extendedPoints, indices, texCoords, true);
+		return new TriangleMesh(extendedPoints, indices, true, texCoords);
 	}
 
 	/**
@@ -200,10 +188,10 @@ public class Road {
     }
     
     public void draw(GL3 gl, CoordFrame3D frame) {
-    	tex = new Texture(gl, "res/textures/sky.bmp","bmp", true);
+    	tex = new Texture(gl, "res/textures/gravel.bmp","bmp", true);
 
-        Shader.setInt(gl, "tex", 1);
-    	gl.glActiveTexture(GL.GL_TEXTURE1);
+        Shader.setInt(gl, "tex", 2);
+    	gl.glActiveTexture(GL.GL_TEXTURE2);
     	gl.glBindTexture(GL.GL_TEXTURE_2D, tex.getId());
     	
     	mesh.init(gl);

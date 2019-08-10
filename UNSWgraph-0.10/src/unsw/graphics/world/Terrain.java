@@ -1,5 +1,7 @@
 package unsw.graphics.world;
 
+import java.awt.Color;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -196,7 +198,7 @@ public class Terrain {
 
     
     /*
-     * create a function that creates the triangle mesh
+     * function that creates the triangle mesh
      */
     private TriangleMesh createMesh(GL3 gl) {
     	
@@ -239,17 +241,20 @@ public class Terrain {
     		}
     	}
 
-		return new TriangleMesh(points, indices, texCoords, true);
+		return new TriangleMesh(points, indices, true, texCoords);
 	}
     
-    public void draw(GL3 gl) {
+    public void draw(GL3 gl) throws IOException {
     	terrainTex = new Texture(gl, "res/textures/grass.bmp","bmp", true);
     	
-        Shader.setInt(gl, "tex", 0);
+    	Shader.setInt(gl, "tex", 0);
     	gl.glActiveTexture(GL.GL_TEXTURE0);
     	gl.glBindTexture(GL.GL_TEXTURE_2D, terrainTex.getId());
-
+    	
+    	Shader.setPenColor(gl, Color.GREEN);
     	mesh.draw(gl);
+    	
+    	Shader.setPenColor(gl, Color.WHITE);
     	for (Tree t : trees) {
     		CoordFrame3D frame = CoordFrame3D.identity()
     					.translate(t.getPosition())

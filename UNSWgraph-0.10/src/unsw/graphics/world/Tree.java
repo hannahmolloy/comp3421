@@ -29,7 +29,7 @@ public class Tree {
     
     public void draw(GL3 gl, CoordFrame3D frame) {
     	try {
-			tree = new TriangleMesh("res/models/tree.ply", true);
+			tree = new TriangleMesh("res/models/tree.ply", true, false);
 			tree.init(gl);
 			tree.draw(gl, frame);
 		} catch (IOException e) {
