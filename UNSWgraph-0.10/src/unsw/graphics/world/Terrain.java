@@ -118,9 +118,8 @@ public class Terrain {
     	// enclose the point in a square made of the floors and ceilings
         int xmin = (int) Math.floor(x);
         int xmax = (int) Math.ceil(x);
-        int zmin = (int) Math.floor(z);
-        int zmax = (int) Math.ceil(z);
-        float hypotenuse = xmin + zmax - z;
+        int zmax = (int) Math.floor(z);
+        int zmin = (int) Math.ceil(z);
         
         // on an integer/vertex, so return
         if(xmin == xmax && zmin == zmax) {
@@ -129,37 +128,55 @@ public class Terrain {
         
         // else linear interpolation to calculate the altitude 
         if(xmin == x || xmax == x) {
-        	altitude = lerpZ(z, zmin, zmax, x, x);
+        	
+        	altitude = lerp(z, zmin, zmax, (float) getGridAltitude((int) x, zmin), (float) getGridAltitude((int) x, zmax));
+        	System.out.println("on x");
+        	
         } else if(zmin == z || zmax == z) {
-        	altitude = lerpX(x, xmin, xmax, z, z);
-        } else if(x < hypotenuse) {
-        	altitude = blerp(x, (float)xmin, (float)xmin, (float)xmax, z, 
-        			(float)zmax, (float)zmin, (float)zmin, hypotenuse);
-        } else {
-        	altitude = blerp(x, (float)xmax, (float)xmax, (float)xmin, z, 
-        			(float)zmin, (float) zmax, (float) zmax, hypotenuse);
+        	
+        	altitude = lerp(x, xmin, xmax, (float) getGridAltitude(xmin, (int) z), (float) getGridAltitude(xmax, (int) z));
+        	System.out.println("on z");
+        	
+        } else if(distance(x, xmin, z, zmax) < distance(x, xmax, z, zmin)) {	// top triangle
+        	
+        	altitude = blerp(x, z, xmax, zmax, xmin, zmin);
+        	System.out.println("top triangle");
+
+        } else {																// bottom triangle
+
+        	altitude = blerp(x, z, xmin, zmin, xmax, zmax);
+        	System.out.println("bottom triangle");
         }
 		
+        System.out.println(x + "\t" + altitude + "\t" + z);
         return altitude;
     }
-
-    // linear interpolation with a given X
-    private float lerpX(float x, float x1, float x2, float z1, float z2) {
-        return (float) (((x - x1) / (x2 - x1)) * getGridAltitude((int)x2, (int)z2) +
-          ((x2 - x) / (x2 - x1)) * getGridAltitude((int)x1, (int)z1));
-    }
     
-    // linear interpolation with a given Z
-    private float lerpZ(float z, float z1, float z2, float x1, float x2) {
-        return (float) (((z - z1) / (z2 - z1)) * getGridAltitude((int)x2, (int)z2) +
-          ((z2 - z) / (z2 - z1)) * getGridAltitude((int)x1, (int)z1));
+    private float distance (float x1, float x2, float z1, float z2) {
+    	
+    	return (float) Math.sqrt(Math.pow((x1 - x2), 2) + Math.pow((z1 - z2), 2));
+    }
+
+    // generic linear interpolation
+    private float lerp(float a, float a1, float a2, float b1, float b2) {
+    	
+        return b1 + (b2 - b1) * ((a - a1)/(a2 - a1));
     }
 
     // bilinear interpolation
-    private float blerp(float x, float x1, float x2, float x3,
-            float z, float z1, float z2, float z3, float hypotenuse) {
-    	return ((x - x1) / (hypotenuse - x1)) * lerpZ(z, z1, z3, x1, x3) +
-    			((hypotenuse - x) / (hypotenuse - x1)) * lerpZ(z, z1, z2, x1, x2);
+    private float blerp(float x, float z, float Bx, float Bz, float Cx, float Cz) {
+    	
+    	float Ax = Cx;
+    	float Az = Bz;
+    	float Dx = Cx;
+    	float Dz = z;
+    	float Ex = lerp(z, Bz, Cz, Bx, Cx);
+    	float Ez = z;
+    	
+    	float Dy = lerp(z, Az, Cz, (float) getGridAltitude((int)Ax, (int)Az), (float)getGridAltitude((int)Cx, (int)Cz));
+    	float Ey = lerp(z, Bz, Cz, (float) getGridAltitude((int)Bx, (int)Bz), (float)getGridAltitude((int)Cx, (int)Cz));
+    	
+    	return lerp(x, Dx, Ex, Dy, Ey); 
     }
 
 
