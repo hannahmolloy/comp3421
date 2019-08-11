@@ -76,8 +76,7 @@ public class World extends Application3D {
     	Shader.setViewMatrix(gl, viewMatrix);
     	Shader.setProjMatrix(gl, projMatrix);
     	
-		if(camera.getTorch()) {
-			
+		if(camera.isTorchOn()) {
 			setBackground(Color.black);
 			
 			Vector3 torchPos = new Vector3(camera.getCameraPosition().getX(), camera.getCameraPosition().getY(), camera.getCameraPosition().getZ());
@@ -85,19 +84,17 @@ public class World extends Application3D {
 			
 			Shader.setInt(gl,  "torch", 1);
 			
-			Shader.setVector3D(gl, "torchlightPos", terrain.getSunlight());
+			Shader.setVector3D(gl, "torchlightPos", torchPos);
 			Shader.setColor(gl, "ambientIntensity", new Color(0.1f, 0.1f, 0.1f));
 			
-			 // Set the material properties
+			// Set the material properties
 			Shader.setColor(gl, "ambientCoeff", Color.white);
 			Shader.setColor(gl, "diffuseCoeff", new Color(0.2f, 0.2f, 0.2f));
 			Shader.setColor(gl, "specularCoeff", new Color(0.4f, 0.4f, 0.4f));
 			Shader.setFloat(gl, "phongExp", 16f);
 			Shader.setColor(gl, "torchlightIntensity", Color.white);
 			
-		}
-		else {
-			
+		} else {
 			setBackground(Color.white);
 			
 			Shader.setInt(gl,  "torch", 0);
@@ -105,17 +102,17 @@ public class World extends Application3D {
 			Shader.setVector3D(gl, "sunlightPos", terrain.getSunlight());
 			Shader.setColor(gl, "ambientIntensity", new Color(0.2f, 0.2f, 0.2f));
 			
-			 // Set the material properties
+			// Set the material properties
 			Shader.setColor(gl, "ambientCoeff", Color.WHITE);
 			Shader.setColor(gl, "diffuseCoeff", new Color(0.6f, 0.6f, 0.6f));
 			Shader.setColor(gl, "specularCoeff", new Color(0.4f, 0.4f, 0.4f));
 			Shader.setFloat(gl, "phongExp", 16f);
-			Shader.setColor(gl, "sunlightIntensity", Color.YELLOW);
+			Shader.setColor(gl, "sunlightIntensity", Color.WHITE);
 		}
 		
     	try {
 			terrain.draw(gl);
-	    	dolphins.draw(gl);
+	    	if (camera.inThirdPerson()) dolphins.draw(gl);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

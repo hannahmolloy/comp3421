@@ -69,11 +69,6 @@ public class Avatar implements KeyListener {
 		if(key == KeyEvent.VK_RIGHT) {
 			turnRight();
 		}
-//		if(keyCode == KeyEvent.VK_T) {
-//			System.out.println("torch");
-//			torch = !torch;
-//		}
-		
 	}
 	
 	private void moveForward() {

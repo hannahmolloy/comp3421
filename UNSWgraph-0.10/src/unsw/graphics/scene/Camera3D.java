@@ -28,43 +28,23 @@ public class Camera3D implements KeyListener{
      * The aspect ratio is the ratio of the width of the window to the height.
      */
     private float myAspectRatio;
-    private float near;
-    private float far;
-    private float fieldOfView;
-    
-    private int width;
-    private int height;
     
     private Point3D position;
     private float yRotation;
     private float xRotation;
     private Vector3 cameraDirection;
-    private float zoom;
     
     private Terrain terrain;
     private boolean torch;
     private boolean thirdPerson;
     private int distance;
     private Avatar avatar;
-    
-//    public Camera3D(SceneObject parent, Point3D position, Terrain terrain) {
-//    	super();
-//        this.terrain = terrain;
-//        this.position = position;
-//        near = 1.0f;
-//        far = 100.0f;
-//        fieldOfView = 60.0f;
-//    }
 
     public Camera3D(Terrain terrain, Avatar avatar) {
     	super();
         this.avatar = avatar;
         this.terrain = terrain;
         this.position = getCameraPosition();
-        near = 1.0f;
-        far = 100.0f;
-        fieldOfView = 60.0f;
-        zoom = 0.1f;
         thirdPerson = false;
         distance = 2;
         cameraDirection = new Vector3(0,0,1);
@@ -85,35 +65,23 @@ public class Camera3D implements KeyListener{
 		if(key == KeyEvent.VK_3) {
 			changeThirdPerson();
 		}
+		if(key == KeyEvent.VK_T) {
+			torch = !torch;
+		}
 	}
 
-	
 	private void changeThirdPerson() {
 		if (!thirdPerson) {
 			distance = 3;
-			moveBackward();
-			moveBackward();
-			this.position.translate(0, distance, 0);
 		} else {
 			distance = 1;
-			moveForward();
-			moveForward();
-			this.position.translate(0, distance, 0);
 		}
 		thirdPerson = !thirdPerson;
 	}
-	
-	private void moveForward() {
-		float x = 0.25f * (float) Math.sin(-1*Math.toRadians(avatar.getRotation()));
-		float z = 0.25f * (float) (-1*Math.cos(Math.toRadians(avatar.getRotation())));
-		float y = terrain.altitude(x + position.getX(), z + position.getZ())
-				- position.getY() + distance;
-		this.position = this.position.translate(x, y, z);
-	}
 
 	private void moveBackward() {
-		float x = 0.25f * (float) Math.sin(Math.toRadians(avatar.getRotation()));
-		float z = 0.25f * (float) Math.cos(Math.toRadians(avatar.getRotation()));
+		float x = (float) Math.sin(Math.toRadians(avatar.getRotation()));
+		float z = (float) Math.cos(Math.toRadians(avatar.getRotation()));
 		float y = terrain.altitude(x + position.getX(), z + position.getZ())
 				- position.getY() + distance;
 		this.position = this.position.translate(x, y, z);
@@ -125,14 +93,12 @@ public class Camera3D implements KeyListener{
 	
 	private Point3D getFirstPersonPosition() {
 		position = avatar.getPosition();
-		moveForward();
-		moveForward();
+		
 		return this.position;
 	}
 
 	private Point3D getThirdPersonPosition() {
 		position = avatar.getPosition();
-		moveBackward();
 		moveBackward();
 		moveBackward();
 		
@@ -148,17 +114,14 @@ public class Camera3D implements KeyListener{
 		return this.xRotation;
 	}
 	
-
-	private void lookUp() {
-		this.xRotation = xRotation + 5.0f;
+	public boolean inThirdPerson() {
+		return thirdPerson;
 	}
 	
-	private void lookDown() {
-		this.xRotation = xRotation - 5.0f;
-	}
-	public boolean getTorch() {
+	public boolean isTorchOn() {
 		return this.torch;
 	}
+	
 	public Vector3 getCameraDir() {
 		return this.cameraDirection;
 	}
