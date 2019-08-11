@@ -128,27 +128,15 @@ public class Terrain {
         
         // else linear interpolation to calculate the altitude 
         if(xmin == x || xmax == x) {
-        	
         	altitude = lerp(z, zmin, zmax, (float) getGridAltitude((int) x, zmin), (float) getGridAltitude((int) x, zmax));
-        	System.out.println("on x");
-        	
         } else if(zmin == z || zmax == z) {
-        	
         	altitude = lerp(x, xmin, xmax, (float) getGridAltitude(xmin, (int) z), (float) getGridAltitude(xmax, (int) z));
-        	System.out.println("on z");
-        	
         } else if(distance(x, xmin, z, zmax) < distance(x, xmax, z, zmin)) {	// top triangle
-        	
         	altitude = blerp(x, z, xmax, zmax, xmin, zmin);
-        	System.out.println("top triangle");
-
         } else {																// bottom triangle
-
         	altitude = blerp(x, z, xmin, zmin, xmax, zmax);
-        	System.out.println("bottom triangle");
         }
 		
-        System.out.println(x + "\t" + altitude + "\t" + z);
         return altitude;
     }
     
@@ -213,7 +201,6 @@ public class Terrain {
         roads.add(road);        
     }
 
-    
     /*
      * function that creates the triangle mesh
      */
@@ -268,7 +255,7 @@ public class Terrain {
     	gl.glActiveTexture(GL.GL_TEXTURE0);
     	gl.glBindTexture(GL.GL_TEXTURE_2D, terrainTex.getId());
     	
-    	Shader.setPenColor(gl, Color.GREEN);
+    	Shader.setPenColor(gl, Color.WHITE);
     	mesh.draw(gl);
     	
     	Shader.setPenColor(gl, Color.WHITE);

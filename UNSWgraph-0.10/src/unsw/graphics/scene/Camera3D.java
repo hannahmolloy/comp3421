@@ -23,7 +23,6 @@ import unsw.graphics.world.Terrain;
  * @author Robert Clifton-Everest
  */
 public class Camera3D implements KeyListener{
-    
     /**
      * The aspect ratio is the ratio of the width of the window to the height.
      */
@@ -47,7 +46,7 @@ public class Camera3D implements KeyListener{
         this.position = getCameraPosition();
         thirdPerson = false;
         distance = 2;
-        cameraDirection = new Vector3(0,0,1);
+        cameraDirection = new Vector3(0,0,-1);
     }
 
     public void reshape(int width, int height) {
@@ -68,6 +67,12 @@ public class Camera3D implements KeyListener{
 		if(key == KeyEvent.VK_T) {
 			torch = !torch;
 		}
+		if(key == KeyEvent.VK_LEFT) {
+			turnLeft();
+		}
+		if(key == KeyEvent.VK_RIGHT) {
+			turnRight();
+		}
 	}
 
 	private void changeThirdPerson() {
@@ -87,19 +92,29 @@ public class Camera3D implements KeyListener{
 		this.position = this.position.translate(x, y, z);
 	}
 
-	private void turnLeft() {
-		this.yRotation = yRotation + 5.0f;
-		cameraDirection = new Vector3(-1*(float)Math.sin(Math.toRadians(yRotation)), 0, -1*(float)Math.cos(Math.toRadians(yRotation)));
-		System.out.println(cameraDirection.getX() + " " + cameraDirection.getY() + " " + cameraDirection.getZ());
-	}
+	// private void turnLeft() {
+	// 	this.yRotation = yRotation + 5.0f;
+	// 	cameraDirection = new Vector3(-1*(float)Math.sin(Math.toRadians(yRotation)), 0, -1*(float)Math.cos(Math.toRadians(yRotation)));
+	// 	System.out.println(cameraDirection.getX() + " " + cameraDirection.getY() + " " + cameraDirection.getZ());
+	// }
 
-	private void turnRight() {
-		this.yRotation = yRotation - 5.0f;
-		cameraDirection = new Vector3(-1*(float)Math.sin(Math.toRadians(yRotation)), 0, -1*(float)Math.cos(Math.toRadians(yRotation)));
-		System.out.println(cameraDirection.getX() + " " + cameraDirection.getY() + " " + cameraDirection.getZ());
+	// private void turnRight() {
+	// 	this.yRotation = yRotation - 5.0f;
+	// 	cameraDirection = new Vector3(-1*(float)Math.sin(Math.toRadians(yRotation)), 0, -1*(float)Math.cos(Math.toRadians(yRotation)));
+	// 	System.out.println(cameraDirection.getX() + " " + cameraDirection.getY() + " " + cameraDirection.getZ());
 		
+	// }
+	
+	private void turnLeft() {
+		this.yRotation = avatar.getRotation();
+		cameraDirection = new Vector3(-1*(float)Math.sin(Math.toRadians(yRotation)), 0, -1*(float)Math.cos(Math.toRadians(yRotation)));
 	}
-
+	
+	private void turnRight() {
+		this.yRotation = avatar.getRotation();
+		cameraDirection = new Vector3(-1*(float)Math.sin(Math.toRadians(yRotation)), 0, -1*(float)Math.cos(Math.toRadians(yRotation)));
+	}
+	
 	public Point3D getCameraPosition() {
 		return thirdPerson ? getThirdPersonPosition() : getFirstPersonPosition();
 	}
@@ -136,6 +151,7 @@ public class Camera3D implements KeyListener{
 	}
 	
 	public Vector3 getCameraDir() {
+		cameraDirection = new Vector3(getCameraPosition().getX(), getCameraPosition().getY(), getCameraPosition().getZ());
 		return this.cameraDirection;
 	}
 
