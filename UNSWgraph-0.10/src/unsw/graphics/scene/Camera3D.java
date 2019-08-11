@@ -46,7 +46,7 @@ public class Camera3D implements KeyListener{
         this.position = getCameraPosition();
         thirdPerson = false;
         distance = 2;
-        cameraDirection = new Vector3(0,0,1);
+        cameraDirection = new Vector3(0,0,-1);
     }
 
     public void reshape(int width, int height) {
@@ -138,8 +138,7 @@ public class Camera3D implements KeyListener{
 	}
 	
 	public Vector3 getCameraDir() {
-		System.out.println(getCameraPosition().getX() + " " + getCameraPosition().getZ());
-		System.out.println(cameraDirection.getX() + " " + cameraDirection.getZ());
+		cameraDirection = new Vector3(getCameraPosition().getX(), getCameraPosition().getY(), getCameraPosition().getZ());
 		return this.cameraDirection;
 	}
 

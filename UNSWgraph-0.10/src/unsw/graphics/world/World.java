@@ -27,12 +27,14 @@ public class World extends Application3D {
     private Terrain terrain;
     private Camera3D camera;
     private Avatar dolphins;
+    private float sunRotation;
 
     public World(Terrain terrain) {
     	super("Assignment 2", 800, 600);
         this.terrain = terrain;
     	dolphins = new Avatar(terrain);
     	camera = new Camera3D(terrain, dolphins);
+    	sunRotation = 0;
     }
    
     /**
@@ -56,7 +58,7 @@ public class World extends Application3D {
 	public void init(GL3 gl) {
 		super.init(gl);
 		terrain.init(gl);
-		Shader shader = new Shader(gl, "shaders/vertex_tex_night.glsl", "shaders/fragment_tex_night.glsl");
+		Shader shader = new Shader(gl, "shaders/vertex_tex_phong.glsl", "shaders/fragment_tex_phong.glsl");
 		shader.use(gl);
 
 		getWindow().addKeyListener(camera);
@@ -76,46 +78,79 @@ public class World extends Application3D {
     	Shader.setViewMatrix(gl, viewMatrix);
     	Shader.setProjMatrix(gl, projMatrix);
     	
-		if(camera.isTorchOn()) {
-			setBackground(Color.black);
-			
-			Vector3 torchPos = new Vector3(camera.getCameraPosition().getX(), camera.getCameraPosition().getY(), camera.getCameraPosition().getZ());
-			//System.out.println(camera.getCameraPosition().getX() + " "+ camera.getCameraPosition().getY() + " " + camera.getCameraPosition().getZ());
-			
-			Shader.setInt(gl,  "torch", 1);
-			Shader.setVector3D(gl, "torchlightPos", torchPos);
-			Shader.setVector3D(gl, "torchDir", camera.getCameraDir());
-			Shader.setColor(gl, "ambientIntensity", new Color(0.2f, 0.2f, 0.2f));
-			
-			// Set the material properties
-			Shader.setColor(gl, "ambientCoeff", Color.white);
-			Shader.setColor(gl, "diffuseCoeff", new Color(0.5f, 0.5f, 0.5f));
-			Shader.setColor(gl, "specularCoeff", new Color(0.4f, 0.4f, 0.4f));
-			Shader.setFloat(gl, "phongExp", 16f);
-			Shader.setColor(gl, "torchlightIntensity", Color.white);
-			
-		} else {
+//		if(camera.isTorchOn()) {
+//			setBackground(Color.black);
+//			
+//			Vector3 torchPos = new Vector3(camera.getCameraPosition().getX(), camera.getCameraPosition().getY(), camera.getCameraPosition().getZ());
+//			//System.out.println(camera.getCameraPosition().getX() + " "+ camera.getCameraPosition().getY() + " " + camera.getCameraPosition().getZ());
+//			
+//			Shader.setInt(gl,  "torch", 1);
+//			Shader.setVector3D(gl, "torchlightPos", torchPos);
+//			Shader.setVector3D(gl, "torchDir", camera.getCameraDir());
+//			Shader.setColor(gl, "ambientIntensity", new Color(0.2f, 0.2f, 0.2f));
+//			
+//			// Set the material properties
+//			Shader.setColor(gl, "ambientCoeff", Color.white);
+//			Shader.setColor(gl, "diffuseCoeff", new Color(0.5f, 0.5f, 0.5f));
+//			Shader.setColor(gl, "specularCoeff", new Color(0.4f, 0.4f, 0.4f));
+//			Shader.setFloat(gl, "phongExp", 16f);
+//			Shader.setColor(gl, "torchlightIntensity", Color.white);
+//			
+//		} else {
 			setBackground(Color.white);
 			
-			Shader.setInt(gl,  "torch", 0);
+//			Shader.setInt(gl,  "torch", 0);
 			
-			Shader.setVector3D(gl, "sunlightPos", terrain.getSunlight());
+			Shader.setVector3D(gl, "lightPos", getSunlight());
 			Shader.setColor(gl, "ambientIntensity", new Color(0.2f, 0.2f, 0.2f));
-			
+
 			// Set the material properties
 			Shader.setColor(gl, "ambientCoeff", Color.WHITE);
 			Shader.setColor(gl, "diffuseCoeff", new Color(0.6f, 0.6f, 0.6f));
-			Shader.setColor(gl, "specularCoeff", new Color(0.4f, 0.4f, 0.4f));
+			Shader.setColor(gl, "specularCoeff", new Color(0.2f, 0.2f, 0.2f));
 			Shader.setFloat(gl, "phongExp", 16f);
-			Shader.setColor(gl, "sunlightIntensity", Color.WHITE);
-		}
-		
+			Shader.setColor(gl, "lightIntensity", new Color(1, getGreen(), getBlue()));
+//		}
     	try {
 			terrain.draw(gl);
 	    	if (camera.inThirdPerson()) dolphins.draw(gl);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+    	sunRotation = (sunRotation + 1) % 360;
+	}
+
+	private float getBlue() {
+		Vector3 sun = getSunlight();
+		Vector3 plane = new Vector3(1, 0, 0);
+		
+		float cosAngle = (float) Math.cos(sun.dotp(plane)/(sun.length()*plane.length()));
+		float angle = (float) Math.acos(cosAngle);
+
+		return 1-angle;
+	}
+	
+	private float getGreen() {
+		Vector3 sun = getSunlight();
+		Vector3 plane = new Vector3(1, 0, 0);
+		
+		float cosAngle = (float) Math.cos(sun.dotp(plane)/(sun.length()*plane.length()));
+		float angle = (float) Math.acos(cosAngle);
+
+		return 1 - angle/2;
+	}
+
+	private Vector3 getSunlight() {
+		Vector3 sun = terrain.getSunlight();
+//		Vector3 xSun = new Vector3(sun.getX(),
+//				(float)(sun.getY()*Math.cos(sunRotation) - sun.getZ()*Math.sin(sunRotation)),
+//				(float)(sun.getY()*Math.sin(sunRotation) + sun.getZ()*Math.cos(sunRotation)));
+//		
+		Vector3 newSun = new Vector3((float)(sun.getX()*Math.cos(Math.toRadians(sunRotation)) - sun.getY()*Math.sin(Math.toRadians(sunRotation))),
+				(float)(sun.getX()*Math.sin(Math.toRadians(sunRotation)) - sun.getX()*Math.cos(Math.toRadians(sunRotation))),
+				(float)(sun.getZ()));
+		
+		return newSun;
 	}
 
 	@Override

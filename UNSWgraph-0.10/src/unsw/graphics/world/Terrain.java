@@ -255,7 +255,7 @@ public class Terrain {
     	gl.glActiveTexture(GL.GL_TEXTURE0);
     	gl.glBindTexture(GL.GL_TEXTURE_2D, terrainTex.getId());
     	
-    	Shader.setPenColor(gl, Color.GREEN);
+    	Shader.setPenColor(gl, Color.WHITE);
     	mesh.draw(gl);
     	
     	Shader.setPenColor(gl, Color.WHITE);
