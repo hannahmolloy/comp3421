@@ -71,10 +71,10 @@ void main()
 	    
 	    float distance = length(viewPosition);
 	  
-	  	float distAttenuation = 100/(distance*distance);
+	  	float distAttenuation = 200/(distance*distance);
 	    
 	    if (B < cutoff){
-	    	diffuse = max(torchlightIntensity*diffuseCoeff*dot(normalize(m_unit),s), 0.0)*pow(cosB, 20)*distAttenuation;
+	    	diffuse = max(torchlightIntensity*diffuseCoeff*dot(normalize(m_unit),s), 0.0)*pow(cosB, 50)*distAttenuation;
 	    }
 	    else {
 	    	diffuse = vec3(0,0,0);
