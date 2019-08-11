@@ -16,9 +16,6 @@ import unsw.graphics.Vector3;
 import unsw.graphics.scene.Camera3D;
 import unsw.graphics.geometry.Point3D;
 
-import com.jogamp.newt.event.KeyAdapter;
-import com.jogamp.newt.event.KeyEvent;
-
 /**
  * COMMENT: Comment Game 
  *
@@ -32,7 +29,6 @@ public class World extends Application3D {
     private Camera3D camera;
     private float zoom;
     private float aspectRatio;
-    private int rotateX, rotateY, rotateZ;
     //private Avatar dolphins;
 
     public World(Terrain terrain) {
@@ -41,9 +37,6 @@ public class World extends Application3D {
         aspectRatio = 1;
     	cameraPos = new Point3D(5,5,15);
     	zoom = 1.0f;
-    	rotateX = 0;
-    	rotateY = 180;
-    	rotateZ = 0;
     	camera = new Camera3D(terrain, cameraPos);
     	//dolphins = new Avatar();
     }
@@ -69,7 +62,7 @@ public class World extends Application3D {
 	public void init(GL3 gl) {
 		super.init(gl);
 		terrain.init(gl);
-		Shader shader = new Shader(gl, "shaders/vertex_tex_night.glsl", "shaders/fragment_tex_phong.glsl");
+		Shader shader = new Shader(gl, "shaders/vertex_tex_night.glsl", "shaders/fragment_tex_night.glsl");
 		shader.use(gl);
 		
 		getWindow().addKeyListener(camera);
@@ -98,10 +91,10 @@ public class World extends Application3D {
 			
 			Vector3 torchPos = new Vector3(camera.getCameraPosition().getX(), camera.getCameraPosition().getY(), camera.getCameraPosition().getZ());
 			System.out.println(camera.getCameraPosition().getX() + " "+ camera.getCameraPosition().getY() + " " + camera.getCameraPosition().getZ());
+			
 			Shader.setInt(gl,  "torch", 1);
 			
 			Shader.setVector3D(gl, "lightPos", torchPos);
-			Shader.setVector3D(gl, "spotDir", camera.getCameraDir());
 			Shader.setColor(gl, "ambientIntensity", new Color(0.2f, 0.2f, 0.2f));
 			
 			 // Set the material properties
@@ -109,7 +102,7 @@ public class World extends Application3D {
 			Shader.setColor(gl, "diffuseCoeff", new Color(0.3f, 0.3f, 0.3f));
 			Shader.setColor(gl, "specularCoeff", new Color(0.5f, 0.5f, 0.5f));
 			Shader.setFloat(gl, "phongExp", 16f);
-			Shader.setColor(gl, "sunlightIntensity", Color.white);
+			Shader.setColor(gl, "torchlightIntensity", Color.white);
 			
 		}
 		else {
