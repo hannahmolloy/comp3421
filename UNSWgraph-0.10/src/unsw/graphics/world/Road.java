@@ -188,7 +188,7 @@ public class Road {
     }
     
     public void draw(GL3 gl, CoordFrame3D frame) {
-    	tex = new Texture(gl, "res/textures/gravel.bmp","bmp", true);
+    	tex = new Texture(gl, "res/textures/grass.bmp","bmp", true);
 
         Shader.setInt(gl, "tex", 2);
     	gl.glActiveTexture(GL.GL_TEXTURE2);

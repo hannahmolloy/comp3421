@@ -13,11 +13,9 @@ import unsw.graphics.Application3D;
 import unsw.graphics.CoordFrame3D;
 import unsw.graphics.Matrix4;
 import unsw.graphics.Shader;
+import unsw.graphics.Vector3;
 import unsw.graphics.scene.Camera3D;
 import unsw.graphics.geometry.Point3D;
-
-import com.jogamp.newt.event.KeyAdapter;
-import com.jogamp.newt.event.KeyEvent;
 
 /**
  * COMMENT: Comment Game 
@@ -58,49 +56,18 @@ public class World extends Application3D {
 	public void init(GL3 gl) {
 		super.init(gl);
 		terrain.init(gl);
-		Shader shader = new Shader(gl, "shaders/vertex_tex_phong.glsl", "shaders/fragment_tex_phong.glsl");
+		Shader shader = new Shader(gl, "shaders/vertex_tex_night.glsl", "shaders/fragment_tex_night.glsl");
 		shader.use(gl);
 
 		getWindow().addKeyListener(camera);
 		getWindow().addKeyListener(dolphins);
-		
-//		getWindow().addKeyListener(new KeyAdapter() {
-//          @Override
-//          public void keyPressed(KeyEvent ev) {
-//        	  
-//              if (ev.getKeyCode() == KeyEvent.VK_LEFT)
-//                  cameraPos = cameraPos.translate(-0.1f/zoom, 0, 0);
-//              else if (ev.getKeyCode() == KeyEvent.VK_RIGHT)
-//                  cameraPos = cameraPos.translate(0.1f/zoom, 0, 0);
-//              else if (ev.getKeyCode() == KeyEvent.VK_UP)
-//                  cameraPos = cameraPos.translate(0, 0.1f/zoom, 0);
-//              else if (ev.getKeyCode() == KeyEvent.VK_DOWN)
-//                  cameraPos = cameraPos.translate(0, -0.1f/zoom, 0);
-//              else if (ev.getKeyCode() == KeyEvent.VK_SPACE)
-//                  zoom *= 1.05;
-//              else if (ev.getKeyCode() == KeyEvent.VK_Z)
-//            	  zoom /= 1.05;
-//              else if (ev.getKeyCode() == KeyEvent.VK_A)
-//            	  rotateY += 10;
-//              else if (ev.getKeyCode() == KeyEvent.VK_D)
-//            	  rotateY -= 10;
-//              else if (ev.getKeyCode() == KeyEvent.VK_W)
-//            	  rotateX -= 10;
-//              else if (ev.getKeyCode() == KeyEvent.VK_S)
-//            	  rotateX += 10;
-//              else if (ev.getKeyCode() == KeyEvent.VK_E)
-//            	  rotateZ -= 10;
-//              else if (ev.getKeyCode() == KeyEvent.VK_R)
-//            	  rotateZ += 10;
-//          }
-//		});
 		
 	}
 
 	@Override
 	public void display(GL3 gl) {
 		super.display(gl);
-		
+
 		Matrix4 viewMatrix = Matrix4.rotationY(-camera.getCameraYRot())
     			.multiply(Matrix4.translation(-camera.getCameraPosition().getX(), -camera.getCameraPosition().getY(), -camera.getCameraPosition().getZ()));
     	
@@ -109,16 +76,42 @@ public class World extends Application3D {
     	Shader.setViewMatrix(gl, viewMatrix);
     	Shader.setProjMatrix(gl, projMatrix);
     	
-		Shader.setVector3D(gl, "lightPos", terrain.getSunlight());
-		Shader.setColor(gl, "lightIntensity", Color.WHITE);
-		Shader.setColor(gl, "ambientIntensity", new Color(0.2f, 0.2f, 0.2f));
-		
-		 // Set the material properties
-		Shader.setColor(gl, "ambientCoeff", Color.WHITE);
-		Shader.setColor(gl, "diffuseCoeff", new Color(0.5f, 0.5f, 0.5f));
-		Shader.setColor(gl, "specularCoeff", new Color(0.8f, 0.8f, 0.8f));
-		Shader.setFloat(gl, "phongExp", 16f);
-		Shader.setColor(gl, "sunlightIntensity", Color.YELLOW);
+		if(camera.getTorch()) {
+			
+			setBackground(Color.black);
+			
+			Vector3 torchPos = new Vector3(camera.getCameraPosition().getX(), camera.getCameraPosition().getY(), camera.getCameraPosition().getZ());
+			System.out.println(camera.getCameraPosition().getX() + " "+ camera.getCameraPosition().getY() + " " + camera.getCameraPosition().getZ());
+			
+			Shader.setInt(gl,  "torch", 1);
+			
+			Shader.setVector3D(gl, "lightPos", torchPos);
+			Shader.setColor(gl, "ambientIntensity", new Color(0.2f, 0.2f, 0.2f));
+			
+			 // Set the material properties
+			Shader.setColor(gl, "ambientCoeff", Color.white);
+			Shader.setColor(gl, "diffuseCoeff", new Color(0.3f, 0.3f, 0.3f));
+			Shader.setColor(gl, "specularCoeff", new Color(0.5f, 0.5f, 0.5f));
+			Shader.setFloat(gl, "phongExp", 16f);
+			Shader.setColor(gl, "torchlightIntensity", Color.white);
+			
+		}
+		else {
+			
+			setBackground(Color.white);
+			
+			Shader.setInt(gl,  "torch", 0);
+			
+			Shader.setVector3D(gl, "lightPos", terrain.getSunlight());
+			Shader.setColor(gl, "ambientIntensity", new Color(0.2f, 0.2f, 0.2f));
+			
+			 // Set the material properties
+			Shader.setColor(gl, "ambientCoeff", Color.WHITE);
+			Shader.setColor(gl, "diffuseCoeff", new Color(0.6f, 0.6f, 0.6f));
+			Shader.setColor(gl, "specularCoeff", new Color(0.8f, 0.8f, 0.8f));
+			Shader.setFloat(gl, "phongExp", 16f);
+			Shader.setColor(gl, "sunlightIntensity", Color.YELLOW);
+		}
 		
     	try {
 			terrain.draw(gl);

@@ -38,9 +38,11 @@ public class Camera3D implements KeyListener{
     private Point3D position;
     private float yRotation;
     private float xRotation;
+    private Vector3 cameraDirection;
     private float zoom;
     
     private Terrain terrain;
+    private boolean torch;
     private boolean thirdPerson;
     private int distance;
     private Avatar avatar;
@@ -65,6 +67,7 @@ public class Camera3D implements KeyListener{
         zoom = 0.1f;
         thirdPerson = false;
         distance = 2;
+        cameraDirection = new Vector3(0,0,1);
     }
 
     public void reshape(int width, int height) {
@@ -78,11 +81,12 @@ public class Camera3D implements KeyListener{
 	@Override
 	public void keyPressed(KeyEvent e) {
 		int key = e.getKeyCode();
-		
+
 		if(key == KeyEvent.VK_3) {
 			changeThirdPerson();
 		}
 	}
+
 	
 	private void changeThirdPerson() {
 		if (!thirdPerson) {
@@ -100,16 +104,16 @@ public class Camera3D implements KeyListener{
 	}
 	
 	private void moveForward() {
-		float x = (float) Math.sin(-1*Math.toRadians(avatar.getRotation()));
-		float z = (float) (-1*Math.cos(Math.toRadians(avatar.getRotation())));
+		float x = 0.25f * (float) Math.sin(-1*Math.toRadians(avatar.getRotation()));
+		float z = 0.25f * (float) (-1*Math.cos(Math.toRadians(avatar.getRotation())));
 		float y = terrain.altitude(x + position.getX(), z + position.getZ())
 				- position.getY() + distance;
 		this.position = this.position.translate(x, y, z);
 	}
 
 	private void moveBackward() {
-		float x = (float) Math.sin(Math.toRadians(avatar.getRotation()));
-		float z = (float) Math.cos(Math.toRadians(avatar.getRotation()));
+		float x = 0.25f * (float) Math.sin(Math.toRadians(avatar.getRotation()));
+		float z = 0.25f * (float) Math.cos(Math.toRadians(avatar.getRotation()));
 		float y = terrain.altitude(x + position.getX(), z + position.getZ())
 				- position.getY() + distance;
 		this.position = this.position.translate(x, y, z);
@@ -151,6 +155,12 @@ public class Camera3D implements KeyListener{
 	
 	private void lookDown() {
 		this.xRotation = xRotation - 5.0f;
+	}
+	public boolean getTorch() {
+		return this.torch;
+	}
+	public Vector3 getCameraDir() {
+		return this.cameraDirection;
 	}
 
 	@Override
