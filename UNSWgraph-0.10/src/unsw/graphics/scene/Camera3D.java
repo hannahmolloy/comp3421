@@ -77,12 +77,12 @@ public class Camera3D implements KeyListener{
 
 	private void changeThirdPerson() {
 		if (!thirdPerson) {
-			distance = 1;
+			distance = 2;
 			position.translate(0, distance, 0);
 		} else {
 			moveBackward();
 			moveBackward();
-			distance = 2;
+			distance = 4;
 			position.translate(0, distance, 0);
 		}
 		thirdPerson = !thirdPerson;
