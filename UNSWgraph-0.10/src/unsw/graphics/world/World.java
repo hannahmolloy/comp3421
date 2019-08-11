@@ -8,15 +8,14 @@ import java.io.IOException;
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL3;
 
+import javafx.scene.Camera;
 import unsw.graphics.Application3D;
 import unsw.graphics.CoordFrame3D;
 import unsw.graphics.Matrix4;
 import unsw.graphics.Shader;
+import unsw.graphics.Vector3;
 import unsw.graphics.scene.Camera3D;
 import unsw.graphics.geometry.Point3D;
-
-import com.jogamp.newt.event.KeyAdapter;
-import com.jogamp.newt.event.KeyEvent;
 
 /**
  * COMMENT: Comment Game 
@@ -26,25 +25,16 @@ import com.jogamp.newt.event.KeyEvent;
 public class World extends Application3D {
 
     private Terrain terrain;
-    private Point3D cameraPos;
-    private float cameraRot;
     private Camera3D camera;
-    private float zoom;
-    private float aspectRatio;
-    private int rotateX, rotateY, rotateZ;
-    private Avatar dolphins;
+    private Avatar avatar;
+    private float sunRotation;
 
     public World(Terrain terrain) {
     	super("Assignment 2", 800, 600);
         this.terrain = terrain;
-        aspectRatio = 1;
-    	cameraPos = new Point3D(5,5,15);
-    	zoom = 1.0f;
-    	rotateX = 0;
-    	rotateY = 180;
-    	rotateZ = 0;
-    	camera = new Camera3D(terrain, cameraPos);
-    	dolphins = new Avatar();
+    	avatar = new Avatar(terrain);
+    	camera = new Camera3D(terrain, avatar);
+    	sunRotation = 0;
     }
    
     /**
@@ -68,95 +58,113 @@ public class World extends Application3D {
 	public void init(GL3 gl) {
 		super.init(gl);
 		terrain.init(gl);
-		Shader shader = new Shader(gl, "shaders/vertex_tex_phong.glsl", "shaders/fragment_tex_phong.glsl");
+		Shader shader = new Shader(gl, "shaders/vertex_tex_night.glsl", "shaders/fragment_tex_night.glsl");
 		shader.use(gl);
-		
+
 		getWindow().addKeyListener(camera);
-		
-//		getWindow().addKeyListener(new KeyAdapter() {
-//          @Override
-//          public void keyPressed(KeyEvent ev) {
-//        	  
-//              if (ev.getKeyCode() == KeyEvent.VK_LEFT)
-//                  cameraPos = cameraPos.translate(-0.1f/zoom, 0, 0);
-//              else if (ev.getKeyCode() == KeyEvent.VK_RIGHT)
-//                  cameraPos = cameraPos.translate(0.1f/zoom, 0, 0);
-//              else if (ev.getKeyCode() == KeyEvent.VK_UP)
-//                  cameraPos = cameraPos.translate(0, 0.1f/zoom, 0);
-//              else if (ev.getKeyCode() == KeyEvent.VK_DOWN)
-//                  cameraPos = cameraPos.translate(0, -0.1f/zoom, 0);
-//              else if (ev.getKeyCode() == KeyEvent.VK_SPACE)
-//                  zoom *= 1.05;
-//              else if (ev.getKeyCode() == KeyEvent.VK_Z)
-//            	  zoom /= 1.05;
-//              else if (ev.getKeyCode() == KeyEvent.VK_A)
-//            	  rotateY += 10;
-//              else if (ev.getKeyCode() == KeyEvent.VK_D)
-//            	  rotateY -= 10;
-//              else if (ev.getKeyCode() == KeyEvent.VK_W)
-//            	  rotateX -= 10;
-//              else if (ev.getKeyCode() == KeyEvent.VK_S)
-//            	  rotateX += 10;
-//              else if (ev.getKeyCode() == KeyEvent.VK_E)
-//            	  rotateZ -= 10;
-//              else if (ev.getKeyCode() == KeyEvent.VK_R)
-//            	  rotateZ += 10;
-//          }
-//		});
-		
+		getWindow().addKeyListener(avatar);
 	}
 
 	@Override
 	public void display(GL3 gl) {
 		super.display(gl);
-		
-		updateCamera();
-		
-		Matrix4 viewMatrix = Matrix4.scale(1/aspectRatio, 1, 1)
-				.multiply(Matrix4.scale(1/zoom, 1/zoom, 1))
-				//.multiply(Matrix4.rotationX(-rotateX))
-				.multiply(Matrix4.rotationY(-cameraRot))
-				//.multiply(Matrix4.rotationZ(-rotateZ))
-    			.multiply(Matrix4.translation(-cameraPos.getX(), -cameraPos.getY() + 1, -cameraPos.getZ()));
+
+		Matrix4 viewMatrix = Matrix4.rotationY(-camera.getCameraYRot())
+    			.multiply(Matrix4.translation(-camera.getCameraPosition().getX(), -camera.getCameraPosition().getY(), -camera.getCameraPosition().getZ()));
     	
     	Matrix4 projMatrix = Matrix4.perspective(60, 1, 0.1f, 100);
         
     	Shader.setViewMatrix(gl, viewMatrix);
     	Shader.setProjMatrix(gl, projMatrix);
     	
-		Shader.setVector3D(gl, "lightPos", terrain.getSunlight());
-		Shader.setColor(gl, "lightIntensity", Color.WHITE);
-		Shader.setColor(gl, "ambientIntensity", new Color(0.2f, 0.2f, 0.2f));
-		
-		 // Set the material properties
-		Shader.setColor(gl, "ambientCoeff", Color.WHITE);
-		Shader.setColor(gl, "diffuseCoeff", new Color(0.5f, 0.5f, 0.5f));
-		Shader.setColor(gl, "specularCoeff", new Color(0.8f, 0.8f, 0.8f));
-		Shader.setFloat(gl, "phongExp", 16f);
-		Shader.setColor(gl, "sunlightIntensity", Color.YELLOW);
-		
+		if(camera.isTorchOn()) {
+			setBackground(Color.black);
+			
+			Vector3 torchPos = new Vector3(camera.getCameraPosition().getX(), camera.getCameraPosition().getY(), camera.getCameraPosition().getZ());
+			//System.out.println(camera.getCameraPosition().getX() + " "+ camera.getCameraPosition().getY() + " " + camera.getCameraPosition().getZ());
+			
+			Shader.setInt(gl,  "torch", 1);
+			
+			Shader.setVector3D(gl, "torchlightPos", torchPos);
+			Shader.setVector3D(gl, "torchlightDir", getCameraDir());
+			Shader.setColor(gl, "ambientIntensity", new Color(0.1f, 0.1f, 0.1f));
+			
+			// Set the material properties
+			Shader.setColor(gl, "ambientCoeff", Color.white);
+			Shader.setColor(gl, "diffuseCoeff", new Color(0.5f, 0.5f, 0.5f));
+			//Shader.setColor(gl, "specularCoeff", new Color(0.4f, 0.4f, 0.4f));
+			Shader.setFloat(gl, "phongExp", 16f);
+			Shader.setColor(gl, "torchlightIntensity", Color.white);
+			
+		} else {
+			setBackground(Color.white);
+			
+			Shader.setInt(gl,  "torch", 0);
+			
+			Shader.setVector3D(gl, "sunlightPos", getSunlight());
+			Shader.setColor(gl, "ambientIntensity", new Color(0.2f, 0.2f, 0.2f));
+
+			// Set the material properties
+			Shader.setColor(gl, "ambientCoeff", Color.WHITE);
+			Shader.setColor(gl, "diffuseCoeff", new Color(0.6f, 0.6f, 0.6f));
+			Shader.setColor(gl, "specularCoeff", new Color(0.2f, 0.2f, 0.2f));
+			Shader.setFloat(gl, "phongExp", 16f);
+			Shader.setColor(gl, "sunlightIntensity", new Color(1, getGreen(), getBlue()));
+		}
     	try {
 			terrain.draw(gl);
-	    	dolphins.draw(gl, CoordFrame3D.identity().translate(5, 1, 5).rotateX(-90).scale(0.003f, 0.003f, 0.003f));
+	    	if (camera.inThirdPerson()) avatar.draw(gl);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+    	sunRotation = (sunRotation + 1) % 360;
+	}
+
+	private float getBlue() {
+		Vector3 sun = getSunlight();
+		Vector3 plane = new Vector3(1, 0, 0);
+		
+		float cosAngle = (float) Math.cos(sun.dotp(plane)/(sun.length()*plane.length()));
+		float angle = (float) Math.acos(cosAngle);
+
+		return 1-angle;
+	}
+	
+	private float getGreen() {
+		Vector3 sun = getSunlight();
+		Vector3 plane = new Vector3(1, 0, 0);
+		
+		float cosAngle = (float) Math.cos(sun.dotp(plane)/(sun.length()*plane.length()));
+		float angle = (float) Math.acos(cosAngle);
+
+		return 1 - angle/2;
+	}
+
+	private Vector3 getSunlight() {
+		Vector3 sun = terrain.getSunlight();
+
+		Vector3 newSun = new Vector3((float)(sun.getX()*Math.cos(Math.toRadians(sunRotation)) - sun.getY()*Math.sin(Math.toRadians(sunRotation))),
+				(float)(sun.getX()*Math.sin(Math.toRadians(sunRotation)) - sun.getX()*Math.cos(Math.toRadians(sunRotation))),
+				(float)(sun.getZ()));
+		
+		return newSun;
+	}
+	
+	private Vector3 getCameraDir() {
+		float yRot = avatar.getRotation();
+		Vector3 dir = new Vector3(-1*(float)Math.sin(Math.toRadians(yRot)), 0, (float)Math.cos(Math.toRadians(yRot)));
+		
+		return dir;
 	}
 
 	@Override
 	public void destroy(GL3 gl) {
 		super.destroy(gl);
-		
 	}
 	
 	@Override
 	public void reshape(GL3 gl, int width, int height) {
         super.reshape(gl, width, height);
         Shader.setProjMatrix(gl, Matrix4.perspective(60, width/(float)height, 1, 100));
-	}
-	
-	public void updateCamera() {
-		this.cameraPos = camera.getCameraPosition();
-		this.cameraRot = camera.getCameraYRot();
 	}
 }
