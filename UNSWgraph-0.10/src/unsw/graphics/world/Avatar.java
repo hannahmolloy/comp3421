@@ -15,23 +15,23 @@ import unsw.graphics.geometry.Point3D;
 import unsw.graphics.geometry.TriangleMesh;
 
 public class Avatar implements KeyListener {
-	private TriangleMesh dolphins;
+	private TriangleMesh mesh;
     
     private Point3D position;
     private float yRotation;
     private float xRotation;
     
     private Terrain terrain;
-    private int distance;
+    private float distance;
 	
 	public Avatar(Terrain terrain) {
 		try {
-			dolphins = new TriangleMesh("res/models/dolphins.ply", true, true);
+			mesh = new TriangleMesh("res/models/shark.ply", true, true);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		this.position = new Point3D(0, terrain.altitude(0, 0), 0);
-		distance = 1;
+		distance = 0.8f;
 		this.terrain = terrain;
 		yRotation = 0;
 		xRotation = 0;
@@ -40,17 +40,17 @@ public class Avatar implements KeyListener {
 	public void draw(GL3 gl) {
 		CoordFrame3D frame = CoordFrame3D.identity();
 		frame = frame.translate(position)
-				.rotateY(yRotation - 90)
-				.rotateX(- 90)
-		.scale(0.003f, 0.003f, 0.003f);
-		dolphins.init(gl);
-	    Texture dolphinTex = new Texture(gl,"res/textures/dolphin.bmp","bmp", true);
+				.rotateY(yRotation- 180)
+				.rotateZ(30)
+				.scale(0.3f, 0.3f, 0.3f);
+		mesh.init(gl);
+	    Texture tex = new Texture(gl,"res/textures/dolphin.bmp","bmp", true);
 		
     	Shader.setInt(gl, "tex", 1);
     	gl.glActiveTexture(GL.GL_TEXTURE1);
-    	gl.glBindTexture(GL.GL_TEXTURE_2D, dolphinTex.getId());
+    	gl.glBindTexture(GL.GL_TEXTURE_2D, tex.getId());
     	Shader.setPenColor(gl, Color.WHITE);
-    	dolphins.draw(gl, frame);
+    	mesh.draw(gl, frame);
 	}
 
 	@Override
@@ -107,6 +107,5 @@ public class Avatar implements KeyListener {
 	@Override
 	public void keyReleased(KeyEvent e) {
 		// TODO Auto-generated method stub
-		
 	}
 }

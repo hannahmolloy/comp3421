@@ -257,7 +257,6 @@ public class TriangleMesh {
         }
     }
 
-
     /**
      * Compute normals for the mesh. Note that they are not normalised normals.
      * If a shader depends on the normals, it must normalise them internally.
