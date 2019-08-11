@@ -88,6 +88,6 @@ void main()
 	
 	    vec4 ambientAndDiffuse = vec4(ambient + diffuse, 1);
 	
-	    outputColor = ambientAndDiffuse*input_color*texture(tex, texCoordFrag); //+ vec4(specular, 1);
+	    outputColor = ambientAndDiffuse*input_color*texture(tex, texCoordFrag) + vec4(specular, 1);
     }
 }
