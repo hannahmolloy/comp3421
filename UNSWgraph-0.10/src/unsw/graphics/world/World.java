@@ -90,11 +90,12 @@ public class World extends Application3D {
 			setBackground(Color.black);
 			
 			Vector3 torchPos = new Vector3(camera.getCameraPosition().getX(), camera.getCameraPosition().getY(), camera.getCameraPosition().getZ());
-			System.out.println(camera.getCameraPosition().getX() + " "+ camera.getCameraPosition().getY() + " " + camera.getCameraPosition().getZ());
+			//System.out.println(camera.getCameraPosition().getX() + " "+ camera.getCameraPosition().getY() + " " + camera.getCameraPosition().getZ());
 			
 			Shader.setInt(gl,  "torch", 1);
 			
-			Shader.setVector3D(gl, "torchlightPos", terrain.getSunlight());
+			Shader.setVector3D(gl, "torchlightPos", torchPos);
+			Shader.setVector3D(gl, "torchDir", camera.getCameraDir());
 			Shader.setColor(gl, "ambientIntensity", new Color(0.1f, 0.1f, 0.1f));
 			
 			 // Set the material properties

@@ -188,15 +188,14 @@ public class Camera3D extends SceneObject implements KeyListener{
 	
 	private void turnLeft() {
 		this.yRotation = yRotation + 5.0f;
-		cameraDirection = new Vector3(-1*(float)Math.sin(Math.toRadians(yRotation)), 0, -1*(float)Math.cos(Math.toRadians(yRotation)));
+		cameraDirection = new Vector3((float)Math.sin(-1*Math.toRadians(yRotation)), position.getY(), -1*(float)Math.cos(Math.toRadians(yRotation)));
 		System.out.println(cameraDirection.getX() + " " + cameraDirection.getY() + " " + cameraDirection.getZ());
 	}
 	
 	private void turnRight() {
 		this.yRotation = yRotation - 5.0f;
-		cameraDirection = new Vector3(-1*(float)Math.sin(Math.toRadians(yRotation)), 0, -1*(float)Math.cos(Math.toRadians(yRotation)));
+		cameraDirection = new Vector3((float)Math.sin(-1*Math.toRadians(yRotation)), position.getY(), -1*(float)Math.cos(Math.toRadians(yRotation)));
 		System.out.println(cameraDirection.getX() + " " + cameraDirection.getY() + " " + cameraDirection.getZ());
-		
 	}
 
 	
