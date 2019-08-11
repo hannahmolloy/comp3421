@@ -23,7 +23,6 @@ import unsw.graphics.world.Terrain;
  * @author Robert Clifton-Everest
  */
 public class Camera3D implements KeyListener{
-    
     /**
      * The aspect ratio is the ratio of the width of the window to the height.
      */
@@ -68,6 +67,12 @@ public class Camera3D implements KeyListener{
 		if(key == KeyEvent.VK_T) {
 			torch = !torch;
 		}
+		if(key == KeyEvent.VK_LEFT) {
+			turnLeft();
+		}
+		if(key == KeyEvent.VK_RIGHT) {
+			turnRight();
+		}
 	}
 
 	private void changeThirdPerson() {
@@ -85,6 +90,16 @@ public class Camera3D implements KeyListener{
 		float y = terrain.altitude(x + position.getX(), z + position.getZ())
 				- position.getY() + distance;
 		this.position = this.position.translate(x, y, z);
+	}
+	
+	private void turnLeft() {
+		this.yRotation = avatar.getRotation();
+		cameraDirection = new Vector3(-1*(float)Math.sin(Math.toRadians(yRotation)), 0, -1*(float)Math.cos(Math.toRadians(yRotation)));
+	}
+	
+	private void turnRight() {
+		this.yRotation = avatar.getRotation();
+		cameraDirection = new Vector3(-1*(float)Math.sin(Math.toRadians(yRotation)), 0, -1*(float)Math.cos(Math.toRadians(yRotation)));
 	}
 	
 	public Point3D getCameraPosition() {
@@ -123,6 +138,8 @@ public class Camera3D implements KeyListener{
 	}
 	
 	public Vector3 getCameraDir() {
+		System.out.println(getCameraPosition().getX() + " " + getCameraPosition().getZ());
+		System.out.println(cameraDirection.getX() + " " + cameraDirection.getZ());
 		return this.cameraDirection;
 	}
 

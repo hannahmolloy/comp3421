@@ -85,11 +85,11 @@ public class World extends Application3D {
 			Shader.setInt(gl,  "torch", 1);
 			Shader.setVector3D(gl, "torchlightPos", torchPos);
 			Shader.setVector3D(gl, "torchDir", camera.getCameraDir());
-			Shader.setColor(gl, "ambientIntensity", new Color(0.1f, 0.1f, 0.1f));
+			Shader.setColor(gl, "ambientIntensity", new Color(0.2f, 0.2f, 0.2f));
 			
 			// Set the material properties
 			Shader.setColor(gl, "ambientCoeff", Color.white);
-			Shader.setColor(gl, "diffuseCoeff", new Color(0.2f, 0.2f, 0.2f));
+			Shader.setColor(gl, "diffuseCoeff", new Color(0.5f, 0.5f, 0.5f));
 			Shader.setColor(gl, "specularCoeff", new Color(0.4f, 0.4f, 0.4f));
 			Shader.setFloat(gl, "phongExp", 16f);
 			Shader.setColor(gl, "torchlightIntensity", Color.white);
