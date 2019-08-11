@@ -51,9 +51,7 @@ void main()
 	    vec4 ambientAndDiffuse = vec4(ambient + diffuse, 1);
 	
 	    outputColor = ambientAndDiffuse*input_color*texture(tex, texCoordFrag) + vec4(specular, 1);
-    }
-    
-    if(torch == 1) {											// night mode
+    } else {											// night mode
     	vec3 m_unit = normalize(m);
 	    // Compute the s, v and r vectors
 	    vec3 s = normalize(view_matrix*vec4(torchlightPos,0)).xyz;
@@ -74,5 +72,4 @@ void main()
 	
 	    outputColor = ambientAndDiffuse*input_color*texture(tex, texCoordFrag) + vec4(specular, 1);
     }
-    
 }
