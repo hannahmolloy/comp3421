@@ -86,12 +86,12 @@ public class Camera3D implements KeyListener{
 	
 	private void changeThirdPerson() {
 		if (!thirdPerson) {
-			distance = 4;
+			distance = 3;
 			moveBackward();
 			moveBackward();
 			this.position.translate(0, distance, 0);
 		} else {
-			distance = 2;
+			distance = 1;
 			moveForward();
 			moveForward();
 			this.position.translate(0, distance, 0);
@@ -116,15 +116,25 @@ public class Camera3D implements KeyListener{
 	}
 	
 	public Point3D getCameraPosition() {
+		return thirdPerson ? getThirdPersonPosition() : getFirstPersonPosition();
+	}
+	
+	private Point3D getFirstPersonPosition() {
+		position = avatar.getPosition();
+		moveForward();
+		moveForward();
+		return this.position;
+	}
+
+	private Point3D getThirdPersonPosition() {
 		position = avatar.getPosition();
 		moveBackward();
 		moveBackward();
 		moveBackward();
-		lookDown();
-		lookDown();
+		
 		return this.position;
 	}
-	
+
 	public float getCameraYRot() {
 		yRotation = avatar.getRotation();
 		return this.yRotation;
