@@ -95,7 +95,7 @@ public class Camera3D implements KeyListener{
 				- position.getY() + distance;
 		this.position = this.position.translate(x, y, z);
 	}
-	
+
 	private void turnLeft() {
 		this.yRotation = avatar.getRotation();
 		cameraDirection = new Vector3(-1*(float)Math.sin(Math.toRadians(yRotation)), 0, -1*(float)Math.cos(Math.toRadians(yRotation)));
@@ -105,7 +105,7 @@ public class Camera3D implements KeyListener{
 		this.yRotation = avatar.getRotation();
 		cameraDirection = new Vector3(-1*(float)Math.sin(Math.toRadians(yRotation)), 0, -1*(float)Math.cos(Math.toRadians(yRotation)));
 	}
-	
+
 	public Point3D getCameraPosition() {
 		return thirdPerson ? getThirdPersonPosition() : getFirstPersonPosition();
 	}

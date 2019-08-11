@@ -84,14 +84,15 @@ public class World extends Application3D {
 			//System.out.println(camera.getCameraPosition().getX() + " "+ camera.getCameraPosition().getY() + " " + camera.getCameraPosition().getZ());
 			
 			Shader.setInt(gl,  "torch", 1);
+			
 			Shader.setVector3D(gl, "torchlightPos", torchPos);
-			Shader.setVector3D(gl, "torchDir", camera.getCameraDir());
-			Shader.setColor(gl, "ambientIntensity", new Color(0.2f, 0.2f, 0.2f));
+			Shader.setVector3D(gl, "torchlightDir", getCameraDir());
+			Shader.setColor(gl, "ambientIntensity", new Color(0.1f, 0.1f, 0.1f));
 			
 			// Set the material properties
 			Shader.setColor(gl, "ambientCoeff", Color.white);
 			Shader.setColor(gl, "diffuseCoeff", new Color(0.5f, 0.5f, 0.5f));
-			Shader.setColor(gl, "specularCoeff", new Color(0.4f, 0.4f, 0.4f));
+			//Shader.setColor(gl, "specularCoeff", new Color(0.4f, 0.4f, 0.4f));
 			Shader.setFloat(gl, "phongExp", 16f);
 			Shader.setColor(gl, "torchlightIntensity", Color.white);
 			
@@ -141,21 +142,24 @@ public class World extends Application3D {
 
 	private Vector3 getSunlight() {
 		Vector3 sun = terrain.getSunlight();
-//		Vector3 xSun = new Vector3(sun.getX(),
-//				(float)(sun.getY()*Math.cos(sunRotation) - sun.getZ()*Math.sin(sunRotation)),
-//				(float)(sun.getY()*Math.sin(sunRotation) + sun.getZ()*Math.cos(sunRotation)));
-//		
+
 		Vector3 newSun = new Vector3((float)(sun.getX()*Math.cos(Math.toRadians(sunRotation)) - sun.getY()*Math.sin(Math.toRadians(sunRotation))),
 				(float)(sun.getX()*Math.sin(Math.toRadians(sunRotation)) - sun.getX()*Math.cos(Math.toRadians(sunRotation))),
 				(float)(sun.getZ()));
 		
 		return newSun;
 	}
+	
+	private Vector3 getCameraDir() {
+		float yRot = avatar.getRotation();
+		Vector3 dir = new Vector3(-1*(float)Math.sin(Math.toRadians(yRot)), 0, (float)Math.cos(Math.toRadians(yRot)));
+		
+		return dir;
+	}
 
 	@Override
 	public void destroy(GL3 gl) {
 		super.destroy(gl);
-		
 	}
 	
 	@Override
