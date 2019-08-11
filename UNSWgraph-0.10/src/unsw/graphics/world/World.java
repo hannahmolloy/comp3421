@@ -8,6 +8,7 @@ import java.io.IOException;
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL3;
 
+import javafx.scene.Camera;
 import unsw.graphics.Application3D;
 import unsw.graphics.CoordFrame3D;
 import unsw.graphics.Matrix4;
@@ -26,25 +27,14 @@ import com.jogamp.newt.event.KeyEvent;
 public class World extends Application3D {
 
     private Terrain terrain;
-    private Point3D cameraPos;
-    private float cameraRot;
     private Camera3D camera;
-    private float zoom;
-    private float aspectRatio;
-    private int rotateX, rotateY, rotateZ;
     private Avatar dolphins;
 
     public World(Terrain terrain) {
     	super("Assignment 2", 800, 600);
         this.terrain = terrain;
-        aspectRatio = 1;
-    	cameraPos = new Point3D(5,5,15);
-    	zoom = 1.0f;
-    	rotateX = 0;
-    	rotateY = 180;
-    	rotateZ = 0;
-    	camera = new Camera3D(terrain, cameraPos);
-    	dolphins = new Avatar();
+    	dolphins = new Avatar(terrain);
+    	camera = new Camera3D(terrain, dolphins);
     }
    
     /**
@@ -70,8 +60,9 @@ public class World extends Application3D {
 		terrain.init(gl);
 		Shader shader = new Shader(gl, "shaders/vertex_tex_phong.glsl", "shaders/fragment_tex_phong.glsl");
 		shader.use(gl);
-		
+
 		getWindow().addKeyListener(camera);
+		getWindow().addKeyListener(dolphins);
 		
 //		getWindow().addKeyListener(new KeyAdapter() {
 //          @Override
@@ -110,14 +101,8 @@ public class World extends Application3D {
 	public void display(GL3 gl) {
 		super.display(gl);
 		
-		updateCamera();
-		
-		Matrix4 viewMatrix = Matrix4.scale(1/aspectRatio, 1, 1)
-				.multiply(Matrix4.scale(1/zoom, 1/zoom, 1))
-				//.multiply(Matrix4.rotationX(-rotateX))
-				.multiply(Matrix4.rotationY(-cameraRot))
-				//.multiply(Matrix4.rotationZ(-rotateZ))
-    			.multiply(Matrix4.translation(-cameraPos.getX(), -cameraPos.getY() + 1, -cameraPos.getZ()));
+		Matrix4 viewMatrix = Matrix4.rotationY(-camera.getCameraYRot())
+    			.multiply(Matrix4.translation(-camera.getCameraPosition().getX(), -camera.getCameraPosition().getY(), -camera.getCameraPosition().getZ()));
     	
     	Matrix4 projMatrix = Matrix4.perspective(60, 1, 0.1f, 100);
         
@@ -137,7 +122,7 @@ public class World extends Application3D {
 		
     	try {
 			terrain.draw(gl);
-	    	dolphins.draw(gl, CoordFrame3D.identity().translate(5, 1, 5).rotateX(-90).scale(0.003f, 0.003f, 0.003f));
+	    	dolphins.draw(gl);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -153,10 +138,5 @@ public class World extends Application3D {
 	public void reshape(GL3 gl, int width, int height) {
         super.reshape(gl, width, height);
         Shader.setProjMatrix(gl, Matrix4.perspective(60, width/(float)height, 1, 100));
-	}
-	
-	public void updateCamera() {
-		this.cameraPos = camera.getCameraPosition();
-		this.cameraRot = camera.getCameraYRot();
 	}
 }
