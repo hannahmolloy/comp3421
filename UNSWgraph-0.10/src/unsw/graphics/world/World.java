@@ -80,18 +80,18 @@ public class World extends Application3D {
 			setBackground(Color.black);
 			
 			Vector3 torchPos = new Vector3(camera.getCameraPosition().getX(), camera.getCameraPosition().getY(), camera.getCameraPosition().getZ());
-			System.out.println(camera.getCameraPosition().getX() + " "+ camera.getCameraPosition().getY() + " " + camera.getCameraPosition().getZ());
+			//System.out.println(camera.getCameraPosition().getX() + " "+ camera.getCameraPosition().getY() + " " + camera.getCameraPosition().getZ());
 			
 			Shader.setInt(gl,  "torch", 1);
 			
 			Shader.setVector3D(gl, "torchlightPos", torchPos);
-			Shader.setVector3D(gl, "torchDir", camera.getCameraDir());
+			Shader.setVector3D(gl, "torchlightDir", getCameraDir());
 			Shader.setColor(gl, "ambientIntensity", new Color(0.1f, 0.1f, 0.1f));
 			
 			// Set the material properties
 			Shader.setColor(gl, "ambientCoeff", Color.white);
-			Shader.setColor(gl, "diffuseCoeff", new Color(0.2f, 0.2f, 0.2f));
-			Shader.setColor(gl, "specularCoeff", new Color(0.4f, 0.4f, 0.4f));
+			Shader.setColor(gl, "diffuseCoeff", new Color(0.5f, 0.5f, 0.5f));
+			//Shader.setColor(gl, "specularCoeff", new Color(0.4f, 0.4f, 0.4f));
 			Shader.setFloat(gl, "phongExp", 16f);
 			Shader.setColor(gl, "torchlightIntensity", Color.white);
 			
@@ -117,6 +117,18 @@ public class World extends Application3D {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	private Vector3 getCameraDir() {
+		float yRot = dolphins.getRotation();
+		float x = dolphins.getPosition().getX();
+		float y = dolphins.getPosition().getY();
+		float z = dolphins.getPosition().getZ();
+		
+		Vector3 dir = new Vector3(-1*(float)Math.sin(Math.toRadians(yRot)), 0, (float)Math.cos(Math.toRadians(yRot)));
+		System.out.println(dir.getX() + " " + dir.getY() + " " + dir.getZ());
+		
+		return dir;
 	}
 
 	@Override
