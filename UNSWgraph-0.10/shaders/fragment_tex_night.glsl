@@ -22,6 +22,7 @@ uniform sampler2D tex;
 uniform int torch;
 uniform vec3 torchlightIntensity;
 uniform vec3 torchlightPos;
+uniform vec3 torchDir;
 
 in vec4 viewPosition;
 in vec3 m;
@@ -53,7 +54,7 @@ void main()
     } else {											// night mode
     	vec3 m_unit = normalize(m);
 	    // Compute the s, v and r vectors
-	    vec3 s = normalize(view_matrix*vec4(torchlightPos,0)).xyz;
+	    vec3 s = normalize(view_matrix*vec4(torchDir,0)).xyz;
 	    vec3 v = normalize(-viewPosition.xyz);
 	    vec3 r = normalize(reflect(-s,m_unit));
 	
