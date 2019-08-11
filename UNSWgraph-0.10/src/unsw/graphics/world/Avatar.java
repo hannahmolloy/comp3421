@@ -30,7 +30,7 @@ public class Avatar implements KeyListener {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		this.position = new Point3D(0, terrain.altitude(0, 0), 0);
+		this.position = new Point3D(10, terrain.altitude(10, 10), 10);
 		distance = 0.8f;
 		this.terrain = terrain;
 		yRotation = 0;
