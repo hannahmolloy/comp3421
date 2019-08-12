@@ -8,7 +8,6 @@ import java.io.IOException;
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL3;
 
-import javafx.scene.Camera;
 import unsw.graphics.Application3D;
 import unsw.graphics.CoordFrame3D;
 import unsw.graphics.Matrix4;
@@ -21,6 +20,13 @@ import unsw.graphics.geometry.Point3D;
  * COMMENT: Comment Game 
  *
  * @author malcolmr
+ * 
+ * Greta Ritchard and Hannah Molloy
+ * 
+ * Extensions implemented:
+ * 		Torch distance attenuation, can be found in the fragment_tex_night file and below
+ * 		Sun position change, can be found below
+ * 
  */
 public class World extends Application3D {
 

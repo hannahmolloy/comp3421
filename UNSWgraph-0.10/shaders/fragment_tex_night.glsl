@@ -65,7 +65,7 @@ void main()
 	    vec3 specular;
 	    
 	    
-	    float cosB = dot(normalize(viewPosition), vec4(0,0,-1,0));
+	    float cosB = dot(normalize(viewPosition), vec4(0,0,-1,0));	// radial attenuation of the torch
 	    float B = acos(cosB);
 	    float cutoff = 20 * 3.14 / 180;
 	    

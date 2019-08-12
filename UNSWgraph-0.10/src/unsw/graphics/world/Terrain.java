@@ -139,7 +139,7 @@ public class Terrain {
 		
         return altitude;
     }
-    
+    // calculate distance between two points
     private float distance (float x1, float x2, float z1, float z2) {
     	
     	return (float) Math.sqrt(Math.pow((x1 - x2), 2) + Math.pow((z1 - z2), 2));
